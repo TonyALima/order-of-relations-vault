@@ -1,0 +1,47 @@
+filters:
+  and:
+    - type == "question"
+    - status == "open"
+formulas:
+  impact_n: if(impact == "high", 3, if(impact == "medium", 2, 1))
+  effort_n: if(effort == "S", 3, if(effort == "M", 2, 1))
+  priority: if(impact == "high", 3, if(impact == "medium", 2, 1)) * 2 + if(effort == "S", 3, if(effort == "M", 2, 1))
+properties:
+  impact:
+    displayName: Impact
+  effort:
+    displayName: Effort
+  formula.priority:
+    displayName: Score
+  decided_by:
+    displayName: Decided by
+  updated:
+    displayName: Updated
+views:
+  - type: table
+    name: Open issues — by score
+    order:
+      - file.name
+      - impact
+      - effort
+      - formula.priority
+      - decided_by
+      - updated
+  - type: table
+    name: Open issues — by impact
+    groupBy:
+      property: impact
+      direction: ASC
+    order:
+      - file.name
+      - impact
+      - effort
+      - formula.priority
+      - updated
+  - type: cards
+    name: Triage board
+    order:
+      - file.name
+      - impact
+      - effort
+      - formula.priority

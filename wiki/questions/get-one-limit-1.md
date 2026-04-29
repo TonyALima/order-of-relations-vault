@@ -11,6 +11,9 @@ tags:
   - query-builder
   - performance
 status: open
+impact: low
+effort: S
+decided_by: ""
 related:
   - "[[QueryBuilder]]"
   - "[[Lazy Query Builder]]"

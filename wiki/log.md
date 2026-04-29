@@ -17,6 +17,44 @@ Append-only record of every wiki operation. Newest entries on top. Never edit pa
 
 ---
 
+## 2026-04-29 — refactor | Turn `wiki/questions/` into an issue tracker
+
+**Decision:** keep open questions in `wiki/questions/` (no new `issues/` folder) and extend each page with `impact` + `effort` + `decided_by` frontmatter. Add a Bases view at `wiki/meta/issues.base` for sorting and filtering.
+
+**Schema added** (per open question):
+
+- `impact: low | medium | high` — cost of leaving the issue open.
+- `effort: S | M | L` — rough implementation size.
+- `decided_by: ""` — wikilink to the ADR that closes it; empty until decided.
+
+**Lifecycle convention** (recorded for future-self): in this vault, `status: open` implies a commitment to implement once decided. There is no "decided but not implemented" state — when a question closes, it closes because the change shipped. Status moves `open → answered`; nothing in between.
+
+**Score formula** (in `issues.base`): `impact × 2 + effort_inverse`, where `high=3, medium=2, low=1` and `S=3, M=2, L=1`. Range 3–9; higher is better. Weighting impact 2× ensures high-impact + L effort outranks low-impact + S effort.
+
+**Initial assignments:**
+
+- [[decorator-order-independence]] — medium / S — score 7. Footgun scales as more sibling decorators (`@Index`, `@Unique`, `@Default`) get added; Option A is the smallest fix.
+- [[get-one-limit-1]] — low / S — score 5. Source explicitly defers; latent dependency on `orderBy` for determinism.
+- [[apply-options-accumulation]] — low / S — score 5. No current double-`applyOptions` site; revisit when scopes appear.
+
+**Files touched:**
+
+- `wiki/questions/decorator-order-independence.md` — frontmatter (impact / effort / decided_by).
+- `wiki/questions/get-one-limit-1.md` — frontmatter.
+- `wiki/questions/apply-options-accumulation.md` — frontmatter.
+- `wiki/questions/_index.md` — issue-tracker preamble + impact/effort table.
+- `wiki/meta/issues.base` — new Bases view (3 views: by-score table, by-impact grouped table, triage cards).
+- `wiki/index.md` — Meta section now points at [[issues]]; Questions section shows impact/effort inline.
+- `wiki/hot.md` — refreshed.
+
+**Why this shape vs alternatives:**
+
+- *Separate `issues/` folder, rejected* — the question pages already contain problem statement, why-it-matters, design space, change surface, and what-would-close-this. They're issues already; duplicating into a new folder splits the source of truth.
+- *Manual ranked list in `_index.md`, rejected* — loses live sort and forces re-ranking by hand on every change.
+- *Dataview instead of Bases, rejected* — adds a community-plugin dependency; Bases is native and sufficient for a 3-row tracker.
+
+---
+
 ## 2026-04-29 — ingest | Drift correction batch (D1, D3, D4, D5, M3, M5, M6)
 
 **Sources:** seven drift-correction notes filed against the wiki after a code-vs-wiki audit.

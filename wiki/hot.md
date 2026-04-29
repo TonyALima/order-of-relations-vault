@@ -15,7 +15,7 @@ sources: []
 
 ## Last Updated
 
-2026-04-29. **Drift correction batch ingested (D1, D3, D4, D5, M3, M5, M6).** Seven `.raw/drift-*` notes audit the wiki against the live `[[order-of-relations]]` codebase and call out specific gaps. All seven now have synthesis pages and the corrections they call for have been applied. Page count: 52.
+2026-04-29. **Open-questions folder turned into an issue tracker.** Each question now carries `impact` (low/medium/high), `effort` (S/M/L), and `decided_by` (ADR backlink, empty until set). New live view at [[issues|Issue tracker]] (`wiki/meta/issues.base`) sorts by `impact × 2 + effort_inverse`. Convention recorded: `open → answered` only; no "decided but not implemented" state. Page count: 52 + 1 (`issues.base`).
 
 ## Drift outcomes
 
@@ -36,12 +36,12 @@ sources: []
 - **`COLUMN_TYPE` is a closed enum (~50 PG types)**; `toForeignKeyType` demotes SERIAL/SMALLSERIAL/BIGSERIAL → INTEGER/SMALLINT/BIGINT for FK columns referencing those PKs.
 - **`examples/inheritance/services/UserHierarchyService.ts`** is the only place `InheritanceSearchType` is shown in use — link to it whenever the option comes up.
 
-## Open Questions (still deferred)
+## Open Questions (now tracked as issues — see [[issues|Issue tracker]])
 
-- 🔓 [[decorator-order-independence]] — could `@Column` / `@Nullable` work regardless of decoration order?
-- 🔓 [[get-one-limit-1]] — `getOne()` slicing vs `LIMIT 1`?
-- 🔓 [[apply-options-accumulation]] — `applyOptions()` replace vs accumulate?
-- 🔓 (potential, from D5) `idx_discriminator` collision — namespace per-table (`idx_<root>_discriminator`)?
+- 🔓 [[decorator-order-independence]] — *medium / S, score 7* — could `@Column` / `@Nullable` work regardless of decoration order?
+- 🔓 [[get-one-limit-1]] — *low / S, score 5* — `getOne()` slicing vs `LIMIT 1`?
+- 🔓 [[apply-options-accumulation]] — *low / S, score 5* — `applyOptions()` replace vs accumulate?
+- 🔓 (potential, from D5, not yet filed) `idx_discriminator` collision — namespace per-table (`idx_<root>_discriminator`)?
 
 ## Active Threads
 

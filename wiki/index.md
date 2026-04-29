@@ -151,15 +151,16 @@ Side-by-side analyses (e.g., OOR vs TypeORM vs Drizzle).
 
 ## Questions — `wiki/questions/`
 
-Filed answers to queries, plus **open questions** kept visible until resolved.
+Filed answers to queries, plus **open questions** kept visible until resolved. Open questions carry `impact` + `effort` frontmatter and surface in the [[issues|Issue tracker]] Base.
 
-- 🔓 [[decorator-order-independence]] — *open* — could `@Column` / `@Nullable` work regardless of decoration order?
-- 🔓 [[get-one-limit-1]] — *open* — `getOne()` slicing vs. `LIMIT 1`?
-- 🔓 [[apply-options-accumulation]] — *open* — `applyOptions()` replace vs. accumulate?
+- 🔓 [[decorator-order-independence]] — *open · medium / S* — could `@Column` / `@Nullable` work regardless of decoration order?
+- 🔓 [[get-one-limit-1]] — *open · low / S* — `getOne()` slicing vs. `LIMIT 1`?
+- 🔓 [[apply-options-accumulation]] — *open · low / S* — `applyOptions()` replace vs. accumulate?
 - See [[questions/_index]] for the rolling index.
 
 ## Meta — `wiki/meta/`
 
 Dashboards, lint reports, conventions.
 
-- _none yet — see [[meta/_index]]_
+- [[issues|Issue tracker]] — Bases view over open questions, sorted by impact × effort score.
+- See [[meta/_index]] for the rolling index.

@@ -11,6 +11,9 @@ tags:
   - decorators
   - design-review
 status: open
+impact: medium
+effort: S
+decided_by: ""
 related:
   - "[[ECMAScript Stage-3 Decorators]]"
   - "[[entity-registration]]"
