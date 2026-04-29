@@ -7,5 +7,10 @@
 # Obsidian — trash and local-only
 .trash/
 
+# Wiki — local-only working state
+.archive/
+.smart-connections/
+.obsidian-git-data
+
 # macOS
 .DS_Store
