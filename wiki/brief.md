@@ -1,0 +1,73 @@
+---
+type: meta
+title: 'OOR — 30-Second Brief'
+created: 2026-04-29
+updated: 2026-04-29
+tags:
+  - meta
+  - brief
+  - agent-context
+status: evergreen
+related:
+  - '[[overview]]'
+  - '[[hot]]'
+  - '[[index]]'
+sources: []
+---
+
+# Order of Relations — 30-Second Brief
+
+> [!note] Audience
+> This page is the **agent-facing single-pager** for code agents working inside `../order-of-relations` (the sibling code repo). It is referenced from that repo's `CLAUDE.md` so every agent picks up project context in seconds without paying for the full wiki. It evolves with the wiki — treat the body as stable, the _facts_ as living.
+
+## What OOR is
+
+An opinionated TypeScript ORM for PostgreSQL. Decorated classes → metadata → `Repository<T>` → fluent `QueryBuilder<T>` → parameterized SQL via Bun's `sql` driver. Doubles as a UNIFEI undergraduate thesis (TCC) and a publishable npm package.
+
+## Hard rules (do not violate)
+
+- **ECMAScript Stage-3 decorators only.** No `reflect-metadata`. → [[0001-stage-3-decorators]]
+- **Parameterized SQL only.** `sql.unsafe` is banned codebase-wide. No `qb.raw()` escape hatch. → [[0004-parameterized-sql-only]]
+- **Strict no-`any`.** Public API is type-driven; required-on-the-type means required-at-the-call-site. → [[0005-no-any-type-driven-api]]
+- **TDD with `bun test`.** Red → green → refactor. Unit tests colocated under `src/`; integration under top-level `tests/`. → [[0006-tdd-rhythm]]
+- **Bun is the single toolchain.** Runtime, package manager, test runner, bundler. No npm/yarn/pnpm. → [[0007-bun-toolchain]]
+- **`@Nullable` must be the inner decorator** when stacked with `@Column`. `@PrimaryColumn` is exempt.
+- **`sqlJoin` is the only sanctioned fragment joiner.** Hand-rolled `reduce` over fragments is rejected as a footgun.
+
+## Architecture in five layers
+
+Downward dependencies only. Decorators are the only writers of metadata.
+
+1. **Decorators** — `@Entity`, `@Column`, `@PrimaryColumn`, `@Nullable`, relation decorators. Write to three symbol keys on `context.metadata`: `COLUMNS_KEY`, `RELATIONS_KEY`, `NULLABLE_KEY`.
+2. **Metadata** — [[MetadataStorage]] is **per-`Database`** (not library-global). `Map<Constructor, EntityMetadata>`, lazy-resolved, idempotent on late additions.
+3. **Repository** — narrow by-key surface. `create` / `findById` / `update` / `delete` funnel through one `requirePrimaryKey` gate. `find()` returns a `QueryBuilder`; `findOne` / `findMany` are sugar. Single error type: `IncompletePrimaryKeyError`. Driver errors propagate unwrapped.
+4. **QueryBuilder** — mutable, single-owner. State is one field: `conditions: Condition[] = []`. Two terminals: `getMany()`, `getOne()`. `applyOptions()` replaces (not accumulates).
+5. **Driver** — Bun's `sql` (PostgreSQL only).
+
+## Method-shape facts worth knowing up front
+
+- `create(entity: T)` — signature is `T`, not `Partial<T>`. Returns `Partial<T>` with **only PK fields** (not a hydrated entity).
+- Autogeneration is **explicit-only**: two strategies (`clientSide` / `dbSide`); a caller-supplied value always wins. → [[Autogeneration]]
+- `where` callback shape: `(conditions: Conditions<T>) => (Condition | undefined)[]`. Missing-column entries throw `UndefinedWhereConditionError` carrying the offending **index**.
+- DI container is **decided but not yet implemented**; current code uses direct `new Repository(User, db)`. → [[0003-singleton-di-container]]
+
+## Where to dig deeper
+
+| When you need…                       | Read                                                                                                   |
+| ------------------------------------ | ------------------------------------------------------------------------------------------------------ |
+| Full architectural map               | [[overview]] · [[Layered Architecture]]                                                                |
+| Most-recent facts / churn            | [[hot]]                                                                                                |
+| Master catalog of every page         | [[index]]                                                                                              |
+| End-to-end walks                     | [[query-lifecycle]] · [[lifecycle-of-a-create]] · [[entity-registration]] · [[schema-create-drop]]     |
+| Decision rationale                   | [[decisions/_index]]                                                                                   |
+| Repository contract                  | [[Repository]] · [[Repository Pattern]]                                                                |
+| Builder mechanics                    | [[QueryBuilder]] · [[Lazy Query Builder]] · [[Conditions Proxy]] · [[Parameterized SQL]] · [[sqlJoin]] |
+| Entity registration & metadata shape | [[MetadataStorage]] · [[Database]]                                                                     |
+
+## Open questions (do not assume resolved)
+
+- 🔓 [[decorator-order-independence]] — `@Column` / `@Nullable` order independence?
+- 🔓 [[get-one-limit-1]] — `getOne()` slicing vs `LIMIT 1`?
+- 🔓 [[apply-options-accumulation]] — `applyOptions()` replace vs accumulate?
+
+This brief stays small on purpose. Anything that grows belongs in a dedicated wiki page; only load-bearing rules and pointers stay here.

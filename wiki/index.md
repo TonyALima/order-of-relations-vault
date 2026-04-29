@@ -7,7 +7,7 @@ tags:
   - meta
   - index
 status: developing
-page_count: 39
+page_count: 40
 related: []
 sources: []
 ---
@@ -23,6 +23,7 @@ Master catalog for the **Order of Relations (OOR)** vault. Update this file on e
 
 ## Top-level
 
+- [[brief]] — 30-second agent-facing project card (linked from `../order-of-relations/CLAUDE.md`)
 - [[overview]] — executive summary of the wiki
 - [[hot]] — recent context cache (~500 words)
 - [[log]] — chronological record of every operation

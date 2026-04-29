@@ -17,6 +17,21 @@ Append-only record of every wiki operation. Newest entries on top. Never edit pa
 
 ---
 
+## 2026-04-29 — meta | add `wiki/brief.md` (agent-facing 30-second project card)
+
+**Reason:** owner needs a stable, terse, code-agent-facing single-pager that can be referenced from `../order-of-relations/CLAUDE.md`. Distinct from [[overview]] (vault navigator) and [[hot]] (volatile churn cache).
+
+**Created:** [[brief]] — top-level meta page; hard rules, five-layer architecture, method-shape facts, dig-deeper table, open questions, wire-up snippet for the code repo's `CLAUDE.md`.
+
+**Updated:** [[index]] — added `[[brief]]` under Top-level; `page_count` 39 → 40.
+
+**Design notes:**
+- Naming: `brief.md` (literal lowercase, top-level meta convention).
+- Status: `evergreen` — body is stable; facts evolve with the wiki.
+- All deeper content reached via wikilinks; the brief itself stays small so the code-side agent pays low fixed cost on every session.
+
+---
+
 ## 2026-04-29 — ingest | Repository Contract (final source)
 
 - Source: `.raw/repository-contract.md` (md5 `d61de455c9be742ded75c7361b428c9b`)
