@@ -2,7 +2,7 @@
 type: domain
 title: "Concepts"
 subdomain_of: ""
-page_count: 11
+page_count: 12
 created: 2026-04-29
 updated: 2026-04-29
 tags:
@@ -30,7 +30,8 @@ Ideas, patterns, and frameworks. A concept page defines what something is and wh
 - [[Parameterized SQL]] — placeholders + bound parameters; the only allowed query form (no `sql.unsafe`).
 - [[sqlJoin]] — the only sanctioned helper for joining SQL fragments; replaces hand-rolled `reduce` patterns.
 - [[Autogeneration]] — explicit-only PK auto-generation with `clientSide` / `dbSide` strategies; commit `3aa354b` removed implicit SERIAL.
+- [[Schema Migrations]] — *seed* — placeholder concept page; no migration system implemented yet. Lists the load-bearing design choices a future implementation would face.
 - [[Dependency Injection Container]] — minimal singleton container for `@Service` / `@InjectRepository` wiring (planned, not yet implemented).
 
 > [!gap] Still to come
-> `Schema migrations` (deeper than `[[schema-create-drop]]`), `Type narrowing in the query builder`, `Repository contract details` — populated as the remaining two `.raw/` notes are ingested.
+> Deeper concepts on `Type narrowing in the query builder`, and `Class-table inheritance details` — populated when future sources or code spot-checks land.

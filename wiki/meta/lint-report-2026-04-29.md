@@ -19,8 +19,10 @@ First lint pass after the bulk-ingest of all five `.raw/` sources.
 - **Real issues found:** 5 dead wikilinks (across 3 unique targets)
 - **False positives identified:** 9 "dead links" that are actually inside backticks (documentation prose), 40+ "empty sections" that are normal heading hierarchy
 - **Auto-fixed (2026-04-29):** 2 — `[[Decorator Metadata Storage]]` rename in `0001-stage-3-decorators.md`, and `first_mentioned` in `order-of-relations.md`
+- **Resolved by stub creation (2026-04-29):** 2 — both `[[Schema Migrations]]` occurrences now resolve to a new seed concept page
 - **Preserved by policy:** 1 — the `[[CLAUDE]]` reference in `log.md:148` is in an append-only log entry; per vault policy, log entries are never edited
-- **Needs review before fixing:** 2 — `[[Schema Migrations]]` (×2 occurrences, same target)
+- **Pending owner decision:** 0
+- **Pending — documentation:** 1 — naming-convention split should be documented in vault `CLAUDE.md`
 - **Naming-convention drift:** 0 within each category; CLAUDE.md doesn't document the per-category convention split — informational
 
 ## Wiki health overall: ✅ green
@@ -44,17 +46,11 @@ First lint pass after the bulk-ingest of all five `.raw/` sources.
 - **`wiki/decisions/0001-stage-3-decorators.md:56`** — written before that source was ingested. The synthesis page now exists at `wiki/sources/decorator-metadata-storage.md`.
 - **Fix applied:** renamed to `[[sources/decorator-metadata-storage|Decorator Metadata Storage]]` and updated the prose from *"when ingested"* to *"for the pin-down"* (since it's now ingested).
 
-#### `[[Schema Migrations]]` — 2 occurrences
+#### `[[Schema Migrations]]` — 2 occurrences — ✅ RESOLVED 2026-04-29
 
 - **`wiki/components/Database.md:54`** — *"Migrations beyond create/drop are out of scope for this class — see `[[Schema Migrations]]`"*
 - **`wiki/flows/schema-create-drop.md:26`** — *"Migrations beyond create/drop … live in `[[Schema Migrations]]` — currently a placeholder."*
-- The page literally doesn't exist. There's no `.raw/schema-migrations.md` source yet, so the page hasn't been written.
-- **Suggest** (three options):
-  1. **Create a stub** at `wiki/concepts/Schema Migrations.md` with `status: seed` and a `> [!gap]` callout saying the deeper concept page awaits a future source.
-  2. **Convert both occurrences to a `> [!gap]` block** without a wikilink (e.g., *"Migrations beyond create/drop are out of scope; that work isn't yet planned."*).
-  3. **Leave as-is** as deliberate "aspirational placeholder" wikilinks — Obsidian will display them as unresolved-link styled text, which itself signals "this is planned but not yet here."
-- **Recommended:** option 1 (stub). Lowest cost; resolves the dead link cleanly; gives a future ingest a place to land. The stub is just frontmatter + a `> [!gap]` block, ~10 lines.
-- **Auto-fix safety:** Needs review — depends on which option you pick.
+- **Resolution:** Created [[Schema Migrations]] as a seed concept page (option 1 from the original three options). The page defines the concept, explicitly flags that no migration system is implemented in OOR yet via a `> [!gap]` callout, lists the load-bearing design choices a future implementation would have to make (versioning model, forward-only vs. up/down, TS-first vs. SQL-first, runner architecture, migration-table location, relationship to `Database.create()`), and links back to the references. The wikilinks in `Database.md` and `schema-create-drop.md` now resolve cleanly without needing edits.
 
 #### `[[CLAUDE]]` — 2 occurrences — 1 fixed, 1 preserved by policy
 
@@ -121,7 +117,7 @@ Status as of 2026-04-29:
 
 1. ✅ **Done** — renamed `[[Decorator Metadata Storage]]` → `[[sources/decorator-metadata-storage|Decorator Metadata Storage]]` in `0001-stage-3-decorators.md:56`.
 2. ✅ **Done** — `first_mentioned` in `order-of-relations.md` retargeted to `[[overview]]`.
-3. ⏸️ **Pending owner decision** — pick a Schema Migrations strategy (see § "Dead Links" → `[[Schema Migrations]]` for the three options).
+3. ✅ **Done** — created [[Schema Migrations]] seed concept page (option 1, stub). Both dead-link occurrences in `Database.md` and `schema-create-drop.md` now resolve.
 4. ⏸️ **Pending** — document naming-convention split in vault `CLAUDE.md`'s "Conventions" section.
 5. ⏸️ **Skipped by policy** — `[[CLAUDE]]` in `log.md:148`: append-only log entry, not editable. Future lint runs should classify `log.md` as a read-only zone.
 

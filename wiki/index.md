@@ -7,7 +7,7 @@ tags:
   - meta
   - index
 status: developing
-page_count: 38
+page_count: 39
 related: []
 sources: []
 ---
@@ -112,6 +112,7 @@ Ideas, patterns, frameworks (e.g., Stage-3 decorators, repository pattern, lazy 
 - [[Parameterized SQL]] — placeholders + bound parameters; the only allowed query form.
 - [[sqlJoin]] — the only sanctioned fragment joiner.
 - [[Autogeneration]] — explicit-only PK auto-generation; `clientSide` / `dbSide` strategies.
+- [[Schema Migrations]] — *seed* — placeholder concept page; no migration system is built yet.
 - [[Dependency Injection Container]] — minimal singleton container (planned, not yet implemented).
 - See [[concepts/_index]] for the rolling index.
 
