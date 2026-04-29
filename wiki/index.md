@@ -7,7 +7,7 @@ tags:
   - meta
   - index
 status: developing
-page_count: 16
+page_count: 17
 related: []
 sources: []
 ---
@@ -80,6 +80,7 @@ One synthesis page per item in `.raw/`.
 
 People, organizations, products, repos, libraries that show up in the work.
 
+- [[order-of-relations]] — **the codebase**. Local: `../order-of-relations`. Remote: <https://github.com/TonyALima/order-of-relations>.
 - [[Bun]] — runtime + package manager + test runner + bundler; the single toolchain.
 - [[PostgreSQL]] — sole target database.
 - [[TypeScript]] — host language; strict no-`any`.

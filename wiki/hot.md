@@ -15,14 +15,18 @@ sources: []
 
 ## Last Updated
 
-2026-04-29. First ingest pass complete: `.raw/welcome.md` is now fully resolved into the wiki (16 new pages). Four `.raw/` files remain pending — the deeper architecture, decorator-storage, query-builder, and repository sources.
+2026-04-29. First ingest pass complete: `.raw/welcome.md` is now fully resolved into the wiki. Codebase location recorded in [[CLAUDE]], [[overview]], and [[order-of-relations]]: local `../order-of-relations`, remote <https://github.com/TonyALima/order-of-relations>. Four `.raw/` files remain pending — the deeper architecture, decorator-storage, query-builder, and repository sources.
+
+## Recently Resolved
+
+- **Test layout** (resolved 2026-04-29): owner confirmed colocation = unit tests, top-level `tests/` = integration tests. [[0006-tdd-rhythm]] amended in-place with a `## Clarification (2026-04-29)` section; the contradiction callout on [[sources/welcome]] downgraded to a "Resolved" note pointing at the clarified ADR. The `.raw/welcome.md` source text itself stays unchanged (immutable).
 
 ## Key Recent Facts
 
 - OOR is a TypeScript ORM for PostgreSQL, accessed via [[Bun]]'s native `SQL` driver. Bun is the single toolchain.
 - The seven foundational ADRs are filed: [[0001-stage-3-decorators]], [[0002-repository-with-lazy-query-builder]], [[0003-singleton-di-container]], [[0004-parameterized-sql-only]], [[0005-no-any-type-driven-api]], [[0006-tdd-rhythm]], [[0007-bun-toolchain]].
 - Five core concept pages exist as **seeds**: [[ECMAScript Stage-3 Decorators]], [[Repository Pattern]], [[Lazy Query Builder]], [[Parameterized SQL]], [[Dependency Injection Container]]. Their depth is intentionally limited — the matching `.raw/` files will fill in mechanism details on later ingests.
-- Three entity pages exist: [[Bun]], [[PostgreSQL]], [[TypeScript]].
+- Four entity pages exist: [[order-of-relations]] (the codebase), [[Bun]], [[PostgreSQL]], [[TypeScript]].
 - Hard rules from welcome.md, now codified as ADRs: no `sql.unsafe`, strict `no-explicit-any`, TDD with `bun test`, parameterized queries only.
 - Project remains simultaneously a TCC (UNIFEI undergraduate thesis) and a publishable npm package.
 

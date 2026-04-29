@@ -17,6 +17,26 @@ Append-only record of every wiki operation. Newest entries on top. Never edit pa
 
 ---
 
+## 2026-04-29 — resolved | Test-layout contradiction
+
+- Owner confirmed: unit tests are colocated as `*.test.ts` next to source under `src/`; integration tests live under the top-level `tests/` directory. Both run under `bun test`.
+- Pages updated:
+  - [[0006-tdd-rhythm]] — Decision section rewritten to split unit vs. integration; new `## Clarification (2026-04-29)` block added; Positive consequences and Alternatives Considered expanded to reflect the dual layout. Original text replaced (this is the wiki side, not the immutable source).
+  - [[sources/welcome]] — `> [!contradiction]` callout downgraded to a `> [!note]` Resolved note pointing at the clarified ADR. The `.raw/welcome.md` file itself is untouched (immutable per vault policy).
+  - [[hot]] — "Open Contradictions" section retired; replaced with a "Recently Resolved" note.
+- Resolution shape used: **clarification, not supersession.** The ADR's load-bearing claim (TDD rhythm + `bun test`) was correct; only the location sub-claim was under-specified.
+
+---
+
+## 2026-04-29 — recorded | Codebase location
+
+- Owner provided the location of the source repo this vault documents: local at `../order-of-relations`, remote at <https://github.com/TonyALima/order-of-relations>.
+- Pages created: [[order-of-relations]] (entity page).
+- Pages updated: [[CLAUDE]] (added "Where the code lives" section), [[overview]] (added repo-location table), [[entities/_index]], [[index]].
+- Verified the local checkout exists. Discovered a contradiction with [[0006-tdd-rhythm]] / [[sources/welcome]]: the manifesto says tests are colocated rather than in a separate `tests/` tree, but the repo has both — 11 colocated `*.test.ts` files plus 3 in `tests/`. Filed `> [!contradiction]` callouts on both pages. Resolution pending owner.
+
+---
+
 ## 2026-04-29 — ingest | Welcome to the OOR Vault
 
 - Source: `.raw/welcome.md` (md5 `6c43e80854db106e0c8ac31648c25c77`)

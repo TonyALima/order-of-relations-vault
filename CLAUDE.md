@@ -5,6 +5,15 @@ Purpose: Persistent knowledge base mapping the OOR codebase — a TypeScript ORM
 Owner: Tony Albert
 Created: 2026-04-29
 
+## Where the code lives
+
+This vault documents a real codebase. The code itself is **not** in this vault.
+
+- **Local checkout:** `../order-of-relations` (sibling directory to this vault's repo).
+- **GitHub:** https://github.com/TonyALima/order-of-relations
+
+When you need to ground a claim in actual source — verify a method signature, check whether a decorator is implemented, confirm a SQL string — read from `../order-of-relations` (or fetch from GitHub if the local checkout is missing). Treat the code as authoritative and the wiki as interpretation; if they disagree, flag a contradiction rather than silently reconciling.
+
 ## Structure
 
 ```

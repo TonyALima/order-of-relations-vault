@@ -24,6 +24,19 @@ The vault is in **GitHub mode**: it maps a code repository as the central object
 
 ---
 
+## Where the Code Lives
+
+This vault is *about* a codebase; it does not contain the code itself. See [[order-of-relations]] for the repository entity page.
+
+| Where | Path / URL |
+|---|---|
+| Local checkout | `../order-of-relations` (sibling directory) |
+| GitHub | <https://github.com/TonyALima/order-of-relations> |
+
+The code is the primary source of truth for behavior. The vault is the primary source of truth for *why*. When the two disagree, file a `> [!contradiction]` callout rather than silently reconciling.
+
+---
+
 ## What Lives Where
 
 | Folder | Holds | Examples |

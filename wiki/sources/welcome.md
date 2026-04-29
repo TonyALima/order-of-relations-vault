@@ -72,3 +72,7 @@ The "High-Level Decisions" section of this source seeded seven ADRs:
 ## Notes
 
 The "Vault Map" section at the bottom of the source lists target wikilinks (`[[Architecture Overview]]`, `[[Decorator Metadata Storage]]`, `[[Query Builder Design]]`, `[[Repository Contract]]`, `[[Schema Migrations]]`, `[[Decisions Log]]`, `[[Open Questions]]`). Most resolve to placeholders today — they are the destinations for upcoming ingests of the four sibling `.raw/` files.
+
+> [!note] Test-layout claim — resolved 2026-04-29
+> This source asserted that test files live "alongside source (`foo.ts` / `foo.test.ts`) rather than in a separate `tests/` tree." Verification against [[order-of-relations]] showed the codebase uses **both** layouts: 11 colocated `*.test.ts` under `src/` (unit tests) and 3 files in a top-level `tests/` directory (integration tests).
+> Resolution: see the **Clarification (2026-04-29)** section of [[0006-tdd-rhythm]]. The original source text above is preserved per the vault's `.raw/`-immutable rule; the resolved rule is the ADR's clarified Decision.

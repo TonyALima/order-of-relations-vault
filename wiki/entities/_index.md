@@ -2,7 +2,7 @@
 type: domain
 title: "Entities"
 subdomain_of: ""
-page_count: 3
+page_count: 4
 created: 2026-04-29
 updated: 2026-04-29
 tags:
@@ -20,6 +20,7 @@ People, organizations, products, repositories, libraries that show up in OOR's d
 
 ## Entity pages
 
+- [[order-of-relations]] — **the codebase this vault documents.** Local: `../order-of-relations`. Remote: <https://github.com/TonyALima/order-of-relations>.
 - [[Bun]] — runtime, package manager, test runner, bundler; the single OOR toolchain. Provides the `SQL` driver.
 - [[PostgreSQL]] — the only database OOR targets. Wire-protocol access via Bun.
 - [[TypeScript]] — host language; strict no-`any`; Stage-3 decorators only.
