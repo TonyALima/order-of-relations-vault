@@ -67,3 +67,13 @@ The code is the primary source of truth for behavior. The vault is the primary s
 - `wiki/hot.md` is overwritten end-to-end after each significant operation.
 
 For day-to-day operation (ingest, query, lint, save), see [[getting-started]].
+
+---
+
+## Canvases
+
+Visual reference boards live under `wiki/canvases/`. Each `.canvas` file is rendered by Obsidian as an infinite board where images, text cards, PDFs, and wiki pages can be arranged spatially.
+
+| Canvas | Purpose |
+|---|---|
+| [[oor-architecture.canvas\|OOR Architecture]] | Visual map of modules, components, and flows |
