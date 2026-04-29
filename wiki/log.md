@@ -17,6 +17,33 @@ Append-only record of every wiki operation. Newest entries on top. Never edit pa
 
 ---
 
+## 2026-04-29 — convention | Add `.inbox/` for cross-context idea capture
+
+**Filed:** new `.inbox/` folder + `.inbox/.processed/` archive + `.inbox/README.md`. Documented in `CLAUDE.md` under Conventions and Operations.
+
+**Use case:** when an idea surfaces while working in a context that doesn't have vault skills/rules loaded — typically a code-agent session in `../order-of-relations`, a vault-unaware chat, or a quick capture from another repo — drop a free-form markdown note into `.inbox/`. Triage happens later in a vault-aware session, which decides per-note whether it becomes an open question, drift correction, ADR seed, direct page edit, or gets discarded.
+
+**Why a new folder vs reusing `.raw/`:** `.raw/` is for shaped, authoritative source documents that ingest synthesizes from. Inbox notes are unshaped, provisional, and may be wrong — treating them as `.raw/` content would (a) violate the "never modify" rule when notes are deleted post-triage, (b) produce a redundant `wiki/sources/X.md` synthesis page per note, and (c) treat half-formed thoughts as authoritative. Different contract → different folder.
+
+**Lifecycle (recorded for future-self):**
+
+1. Drop file → `.inbox/<slug>.md` (any agent / context can do this; no schema required).
+2. Triage → in a vault-aware session: `triage my inbox` or `process .inbox/<file>`.
+3. Resolve → Claude files into the right wiki location, then moves original to `.inbox/.processed/<slug>.md` (kept as audit trail, not deleted).
+
+**Decision: keep committed**, not gitignored. Cost is rounding error; benefit is durable inbox across machines and the `.processed/` archive becomes a retrospective ("what ideas have I had over this project's lifetime?").
+
+**Files touched:**
+
+- `.inbox/.gitkeep`, `.inbox/.processed/.gitkeep` — directory placeholders.
+- `.inbox/README.md` — full convention doc, readable by any agent that drops a file there.
+- `CLAUDE.md` — `.inbox/` added to the structure tree; new Conventions bullet; new Operations bullet (`triage inbox`); new "Ingest vs triage" decision table to disambiguate.
+- `wiki/hot.md` — note the new convention.
+
+**Why a decision table in CLAUDE.md:** the failure mode I'm guarding against is "future-me drops an idea into `.raw/` because it feels source-shaped, ingest synthesizes it, lint flags the thin synthesis." Three rows of `| Source | Folder | Operation |` makes the right choice obvious at glance — much cheaper than re-deriving the rule each time.
+
+---
+
 ## 2026-04-29 — file | New open question: support user-defined indexes
 
 **Filed:** [[support-user-indexes]] — add `@Index` / `@Unique` decorators so users can declare indexes on columns and column-tuples; `schema-create` should emit `CREATE INDEX` alongside `CREATE TABLE`.

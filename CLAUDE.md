@@ -19,6 +19,8 @@ When you need to ground a claim in actual source — verify a method signature, 
 ```
 vault/
 ├── .raw/                       # immutable source documents — never edit
+├── .inbox/                     # staging for unshaped notes from other contexts; triage moves items into wiki/
+│   └── .processed/             # archive of inbox items already filed
 ├── wiki/
 │   ├── index.md                # master catalog of every page
 │   ├── log.md                  # append-only operation history (newest on top)
@@ -47,6 +49,7 @@ vault/
 - All notes use YAML frontmatter: `type`, `title`, `created`, `updated`, `tags`, `status` (minimum). See `_templates/` for the canonical shape.
 - Wikilinks use `[[Note Name]]` — filenames are unique across the vault, so the bare basename usually works. For sources and other path-prefixed targets, the path-form `[[sources/welcome]]` (with optional alias `[[sources/welcome|Welcome]]`) is also valid and renders cleaner.
 - `.raw/` contains source documents and is **never modified**. To correct or extend a source, file a new note in `wiki/` that links back to it.
+- `.inbox/` is the staging area for **unshaped notes from other contexts** (code-agent sessions, vault-unaware chats, quick captures). No schema required; one file per idea. Triage in a vault-aware session moves each item into the right wiki location and archives the original to `.inbox/.processed/`. Never use `.inbox/` for shaped sources — those go in `.raw/`. See `.inbox/README.md`.
 - `wiki/index.md` is the master catalog: update on every ingest.
 - `wiki/log.md` is **append-only**: never edit past entries; new entries go at the **top**. *Dead wikilinks inside past log entries are preserved as audit trail and are not lint issues.*
 - `wiki/hot.md` is overwritten end-to-end after every significant operation. Keep under 500 words.
@@ -72,11 +75,20 @@ When in doubt: look at neighboring files in the same folder and match the local 
 
 ## Operations
 
-- **Ingest:** drop a source into `.raw/`, say `ingest <filename>`. Claude routes through the `wiki-ingest` skill.
+- **Ingest:** drop a *shaped source* into `.raw/`, say `ingest <filename>`. Claude routes through the `wiki-ingest` skill. Use this for design memos, architecture docs, drift audits — anything authoritative.
+- **Triage inbox:** drop *unshaped notes* into `.inbox/`, say `triage my inbox` (or `process .inbox/<file>`). Vault-aware Claude reads each note, proposes a destination (open question, drift correction, ADR seed, page edit, or discard), files it on confirmation, and moves the original to `.inbox/.processed/`. Use this when an idea surfaces in a context that doesn't know vault conventions.
 - **Query:** ask any question; Claude reads `hot.md`, then `index.md`, then drills into specific pages.
 - **Lint:** say `lint the wiki` to run `wiki-lint` (orphans, dead wikilinks, stale claims).
 - **Save:** say `save this` to file the current chat as a structured note.
 - **Archive:** move cold sources to `.archive/` (create on demand) to keep `.raw/` lean.
+
+### Ingest vs triage — which one?
+
+| Source | Folder | Operation | Why |
+|---|---|---|---|
+| Shaped, authoritative document (design memo, architecture doc, drift audit) | `.raw/` | `ingest` | Ingest extracts entities/concepts/flows and produces a `wiki/sources/X.md` synthesis. Treats input as authoritative. |
+| Unshaped scratch note (code-agent jotting, half-formed thought, idea from another repo) | `.inbox/` | `triage my inbox` | Triage decides per-note whether it becomes a question, drift correction, ADR, or page edit. Treats input as provisional. |
+| Idea you can describe in chat right now | — | just say it | Vault-aware Claude writes the page directly. No file needed. |
 
 ## Getting Started
 

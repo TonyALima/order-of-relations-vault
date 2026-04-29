@@ -15,7 +15,7 @@ sources: []
 
 ## Last Updated
 
-2026-04-29. **Open-questions folder turned into an issue tracker.** Each question now carries `impact` (low/medium/high), `effort` (S/M/L), and `decided_by` (ADR backlink, empty until set). New live view at [[issues|Issue tracker]] (`wiki/meta/issues.base`) sorts by `impact × 2 + effort_inverse`. Convention recorded: `open → answered` only; no "decided but not implemented" state. Page count: 52 + 1 (`issues.base`).
+2026-04-29. **Two structural changes today.** (1) Open-questions folder turned into an issue tracker — `impact` (low/medium/high), `effort` (S/M/L), `decided_by` frontmatter; live view at [[issues|Issue tracker]] (`wiki/meta/issues.base`); convention `open → answered` only (no "decided but not implemented"). (2) New `.inbox/` folder for cross-context idea capture: drop free-form notes from code-agent sessions or other vault-unaware contexts, then `triage my inbox` in a vault-aware session to file each into the right wiki location. Distinct from `.raw/` (which is for shaped, authoritative sources). Page count: 52 wiki pages + 1 `issues.base` + new `.inbox/README.md`.
 
 ## Drift outcomes
 
