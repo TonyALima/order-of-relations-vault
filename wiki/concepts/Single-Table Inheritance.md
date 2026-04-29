@@ -41,6 +41,36 @@ When [[MetadataStorage]] resolves inheritance:
 
 Resolution is gated by `isMetadataResolved`. The flag is reset on every `set()`, so adding a new entity invalidates the cache and the next read recomputes — idempotently. The "re-resolving after a new entity is added does not corrupt discriminator" test in `metadata.test.ts` pins this contract.
 
+## Reading Across the Hierarchy
+
+The user-facing API for STI reads is the `inheritance` field on `FindOptions<T>`, backed by the closed `InheritanceSearchType` enum:
+
+```ts
+import { InheritanceSearchType } from 'order-of-relations';
+
+const userRepo  = new Repository(User, db);
+const adminRepo = new Repository(AdminUser, db);
+
+// Default (ALL): every row in the User table — User AND AdminUser rows.
+await userRepo.findMany();
+
+// ONLY: just rows whose discriminator matches the entity exactly.
+await userRepo.findMany({ inheritance: InheritanceSearchType.ONLY });
+
+// SUBCLASSES: this entity's rows plus every descendant's rows, all typed as T.
+await userRepo.findMany({ inheritance: InheritanceSearchType.SUBCLASSES });
+```
+
+| Value | Predicate added | Meaning |
+|---|---|---|
+| `ALL` | (none) | Read every row in the inherited table; caller takes responsibility for sibling rows. |
+| `ONLY` | `discriminator = <self>` | Just `T` rows. |
+| `SUBCLASSES` | `discriminator IN (...)` | `T` plus every descendant discovered by prototype walk. |
+
+The discriminator-only-when-needed rule still applies: if `T` is alone in its table (no sibling registered yet), `meta.discriminator` is `undefined` and no predicate is emitted — `findMany({ inheritance: ONLY })` is a no-op at SQL level. As soon as a sibling registers and metadata re-resolves, the same call starts filtering.
+
+`examples/inheritance/services/UserHierarchyService.ts` is the canonical demonstration — see [[examples/inheritance]]. See [[QueryBuilder]] § `applyOptions()` for the implementation, and [[sources/drift-d3-find-options-inheritance]] for the documentation gap this section closes.
+
 ## Why It Matters
 
 - **Shared schema, distinct types.** `User` and `AdminUser` live in the same `users` table; queries against either type project to the same rows, distinguished by the discriminator.
@@ -68,6 +98,18 @@ After resolution:
 If only `User` were registered, its discriminator would be **empty** (no sibling to disambiguate). Once `AdminUser` registers and the next read triggers re-resolution, both pick up their discriminators.
 
 For a multi-level chain `Base ← User ← AdminUser`, all three collapse to `Base`'s table; the discriminator on each is its own class name.
+
+## What Schema-Create Emits
+
+For an STI root with a truthy discriminator, `Database.create()` emits three statements in the base-tables pass:
+
+1. `CREATE TABLE <root> (<columns>, PRIMARY KEY (...))`
+2. `ALTER TABLE <root> ADD COLUMN discriminator TEXT NOT NULL;`
+3. `CREATE INDEX idx_discriminator ON <root>(discriminator);`
+
+Subclass entities — whose `tableName` was rewritten to the root's during `resolveInheritance`, so `discriminator !== tableName` — are **skipped** in the base-tables pass. Only the root produces DDL; subclasses just contribute their columns to the root's table via the inheritance-resolved metadata.
+
+The `idx_discriminator` index is shared across every STI table in the schema (same name everywhere). With one hierarchy this is fine; two coexisting hierarchies would collide on the duplicate index name. See [[schema-create-drop]] § STI emissions and [[sources/drift-d5-discriminator-index]].
 
 ## Pitfalls
 

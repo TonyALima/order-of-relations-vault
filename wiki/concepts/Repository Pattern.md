@@ -34,14 +34,15 @@ In OOR the type is `Repository<T>`, parameterized by the entity class. One repos
 `Repository<T>` exposes a **narrow** surface, split by axis:
 
 - **By-key (single-row) operations.** `create(entity: T)`, `findById(key)`, `update(entity)`, `delete(key)`. All four funnel through one private `requirePrimaryKey` gate that decides "complete" based on each PK column's `autogeneration` metadata. The same gate, the same error (`IncompletePrimaryKeyError`).
-- **Composed reads.** `find()` (returns a `QueryBuilder<T>` and runs no SQL), plus `findOne(options?)` / `findMany(options?)` which are sugar that build a `QueryBuilder<T>`, apply options, and call its terminal in one shot. `findById` is the one by-key reader; everything else read-side flows through the builder.
+- **Composed reads.** `findOne(options?)` and `findMany(options?)` are the composition entry points: each accepts a `FindOptions<T>`, builds a `QueryBuilder<T>` internally, applies options, and calls the terminal (`getOne()` / `getMany()`) in one shot. `findById` is the one by-key reader; the other read methods own the builder for exactly one call.
 
 The headline rule: **single-row by-key operations on `Repository`; anything composed via `QueryBuilder`.**
 
-> [!note] Refined 2026-04-29 (×3)
+> [!note] Refined 2026-04-29 (×4)
 > 1. *(ingest of architecture-overview)* Earlier "direct operations execute SQL synchronously" framing was wrong; reads-through-builder is the actual rule.
 > 2. *(ingest of repository-contract)* The split is sharpened from "writes vs. reads" to "**by-key vs. composed**." `findById` is by-key (no builder); other reads are composed (via builder). `create` / `update` / `delete` are by-key writes.
 > 3. *(ingest of repository-contract)* `create()`'s signature is `T`, **not** `Partial<T>` (commit `92ce5fd`). The argument's *type itself* encodes the contract — the type system does the validation. See § "How decorators shape the contract" below.
+> 4. *(drift D1, 2026-04-29)* The earlier framing of `find()` as "the composition entry point" with `findOne` / `findMany` as "sugar" was wrong — there is no `find()` method. `findOne` / `findMany` *are* the composition entry points. See [[sources/drift-d1-repository-find]].
 
 `Repository<T>` is currently constructed directly: `new Repository(User, db)`. The originally-planned `@InjectRepository(Entity)` decorator and accompanying [[Dependency Injection Container|DI container]] are **not yet implemented in `src/`** — see the implementation-status callout on [[0003-singleton-di-container]].
 
@@ -77,14 +78,14 @@ const { id } = await userRepository.create({ email: 'a@b.com', name: 'Alice' });
 const user = await userRepository.findById(id);
 
 // Composed read — `where` is a callback receiving a typed proxy.
-// See [[Conditions Proxy]].
+// See [[Conditions Proxy]]. findMany / findOne build a QueryBuilder
+// internally, apply options, and call the terminal in one shot.
 const active = await userRepository.findMany({
   where: (u) => [u.active!.eq(true)],
 });
-
-// Handoff: get the builder directly when composition is needed.
-const builder = userRepository.find();
 ```
+
+See `examples/basic-crud/services/UserService.ts` for the canonical no-DI construction pattern.
 
 Planned ergonomics, **once DI ships** (currently aspirational — see [[0003-singleton-di-container]]):
 

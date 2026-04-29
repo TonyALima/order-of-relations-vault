@@ -56,15 +56,18 @@ Here `u` is the conditions proxy for `User`; `u.email` is a `FieldConditionBuild
 The query builder constructs the proxy from the entity's [[MetadataStorage|column metadata]]:
 
 - For each `ColumnMetadata`, attach a `FieldConditionBuilder` keyed by the column property name.
-- Each builder carries the operators valid for the column's type — `.eq`, `.neq`, `.in`, `.lt`, `.gt`, etc. — pre-tokenised from a fragment table.
-- The proxy's *type* is derived from the entity class itself: TypeScript's mapped types take `T`'s columns and produce `{ [K in keyof Columns<T>]: FieldConditionBuilder<Columns<T>[K]> }`.
+- Each `FieldConditionBuilder<V>` exposes **the same nine methods regardless of `V`**:
+  - **Comparison:** `eq(v)`, `ne(v)`, `gt(v)`, `gte(v)`, `lt(v)`, `lte(v)` — produce `=`, `!=`, `>`, `>=`, `<`, `<=` respectively.
+  - **Null tests:** `isNull()`, `isNotNull()` — produce `IS NULL` / `IS NOT NULL`.
+  - **Set membership:** `in(values: V[])` — produces `IN (...)`. An empty array is a valid no-match `IN ()`; the test suite pins this.
+- The proxy's *type* is derived from the entity class itself: TypeScript's mapped types take `T`'s columns and produce `{ [K in keyof T]?: FieldConditionBuilder<T[K]> }`.
 
 The user's `where` callback runs, returns an array, and the array contents are validated (see [[query-lifecycle]] step 4) before SQL composition.
 
 ## Why It Matters
 
 - **Type-safe column references.** Misspelling a column name doesn't pass typecheck; the proxy doesn't expose properties that aren't columns.
-- **Type-safe operators.** A `Date` column's `FieldConditionBuilder` exposes `.before` / `.after` but not `.matches`; the type system rejects the wrong operator at compile time.
+- **Type-safe values, uniform operator surface.** The compile-time guarantee is on the **value parameter** — `gt(v: V)` rejects a value whose type doesn't match `V`. There is **no per-column-type narrowing on operator availability**: a `Date` column and a `number` column expose the same nine methods. (A future API could narrow further — e.g. exposing string-specific `like` or date-specific `between` only on the right column types — but today the surface is uniform.)
 - **No string concatenation.** Operators are pre-tokenised into SQL fragments; values stay as parameters. The proxy is the user-facing layer that makes [[Parameterized SQL]] enforceable in composed reads.
 - **No `any`.** The whole construction relies on conditional / mapped types — exactly the pattern [[0005-no-any-type-driven-api]] commits to.
 
@@ -96,10 +99,13 @@ userRepo.findMany({ where: (u) => [u.email!.eq('a@b.com')] });
 userRepo.findMany({
   where: (u) => [
     u.active!.eq(true),
-    u.createdAt!.after(new Date('2026-01-01')),
+    u.createdAt!.gt(new Date('2026-01-01')),
   ],
 });
 ```
+
+> [!note] Refined 2026-04-29 (drift D4)
+> An earlier version of this page listed `.neq` (the actual method is `ne`) and `.before` / `.after` / `.matches` (none exist) as if they were per-column-type narrowed operators. The real surface is the nine uniform methods documented above; the `.raw/query-builder-design.md` source had it right and the synthesis introduced the drift. See [[sources/drift-d4-conditions-proxy-operators]].
 
 ## Connections
 

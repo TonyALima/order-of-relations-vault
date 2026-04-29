@@ -2,7 +2,7 @@
 type: domain
 title: "Modules"
 subdomain_of: ""
-page_count: 0
+page_count: 1
 created: 2026-04-29
 updated: 2026-04-29
 tags:
@@ -14,13 +14,14 @@ related:
   - "[[Layered Architecture]]"
 sources:
   - "../.raw/architecture-overview.md"
+  - "../.raw/drift-m3-module-pages.md"
 ---
 
 # Modules
 
 One note per major module / package / service in the OOR codebase. Each entry maps to a real directory under [[order-of-relations]]'s `src/`.
 
-> Module pages themselves are not yet filed — but the source-tree map below is the authoritative catalog of which directory holds what, ingested from `.raw/architecture-overview.md` § "Source Tree, by Concern." Use it as a routing guide.
+> The source-tree map below is the authoritative catalog of which directory holds what (ingested from `.raw/architecture-overview.md` § "Source Tree, by Concern"). The table groups by concern, not leaf — the actual `src/` tree has **11 leaf directories** (6 under `core/`, 4 under `decorators/`, plus `query-builder/`). See [[sources/drift-m3-module-pages]] for the per-leaf inventory and the partial-Path-A decision (file pages where there's substantive uncovered surface; defer the rest).
 
 ## Source-tree map
 
@@ -47,7 +48,22 @@ When in doubt about where new code belongs, the import direction makes the answe
 
 ## Module pages
 
-- _none yet — pending deeper ingests of `.raw/decorator-metadata-storage.md`, `.raw/query-builder-design.md`, `.raw/repository-contract.md`._
+- [[modules/sql-types]] — `COLUMN_TYPE` enum, `getColumnTypeDefinition` (the only DDL fragment producer), `toForeignKeyType` (SERIAL→INTEGER FK demotion).
+
+### Deferred (handled elsewhere or low-leverage)
+
+| Module | Coverage | Status |
+|---|---|---|
+| `src/core/database/` | [[Database]] component page | Component page covers it; module stub deferred. |
+| `src/core/repository/` | [[Repository]] component page | Component page covers it; module stub deferred. |
+| `src/core/metadata/` | [[MetadataStorage]] component page | Component page covers it; module stub deferred. |
+| `src/query-builder/` | [[QueryBuilder]] component page | Component page covers it; module stub deferred. |
+| `src/core/utils/` | [[sqlJoin]] concept covers half | `Constructor` type helpers uncovered — file later if useful. |
+| `src/core/orm-error/` | None | High-leverage; file in a future drift pass. |
+| `src/decorators/entity/` | [[entity-registration]] flow | Flow covers it; module stub deferred. |
+| `src/decorators/column/` | [[Autogeneration]] concept | Concept covers `@PrimaryColumn`/`@Column` interactions. |
+| `src/decorators/nullable/` | Mentioned in [[Repository]], [[Repository Pattern]] | `NullableField`/`NotNullableField` mechanic is load-bearing — file later. |
+| `src/decorators/relation/` | [[Relation Target Thunk]] covers thunk only | `@ToOne(options)` and `OneToOneOptions.foreignKeys` undocumented — file later. |
 
 ## Frontmatter for module pages
 

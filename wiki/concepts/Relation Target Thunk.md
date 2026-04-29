@@ -72,7 +72,7 @@ Inside [[MetadataStorage]]'s `resolveRelations` pass (Step 4 of [[entity-registr
 
 1. For each `RelationMetadata` in storage, invoke `getTarget()`.
 2. Look up the returned constructor in the storage `Map`.
-3. If found, fill in foreign-key column names and other resolved fields.
+3. If found, fill in foreign-key column names and the FK column **types**, derived by calling `toForeignKeyType(pk.type)` on each primary column of the target. SERIAL/SMALLSERIAL/BIGSERIAL get demoted to their underlying integer types so the FK doesn't claim its own sequence — see [[modules/sql-types]] § Foreign-key type demotion.
 4. If **not** found (the target was never registered with `@Entity`), throw `RelationTargetNotFoundError` with the target class name and the source's relation path (e.g., `posts.author`).
 
 This is the canonical "I forgot to import the related entity, so its decorator never ran" failure mode — caught at first storage read, with enough context to diagnose.

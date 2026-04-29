@@ -53,7 +53,18 @@ The class is **mutable, not immutable-by-copy** — see § Mutability.
 
 There is no scenario today where two consumers hold the same builder and expect divergent state.
 
-## `applyOptions()` is replace, not accumulate
+## `applyOptions()` — what it consumes
+
+`FindOptions<T>` carries two fields today:
+
+```ts
+export interface FindOptions<T> {
+  where?: (conditions: Conditions<T>) => (Condition | undefined)[];
+  inheritance?: InheritanceSearchType;
+}
+```
+
+### `where` — replace, not accumulate
 
 Calling `applyOptions()` twice **replaces** the where-conditions wholesale (`this.conditions = results`). Deliberate "last call wins."
 
@@ -63,6 +74,37 @@ This may surprise consumers who expect classic builder semantics where every `.w
 - Partial composition is not a use case today; introducing it implicitly via accumulation could mask bugs (forgotten reset, surprising AND with stale state).
 
 See [[apply-options-accumulation]] — open question on whether to flip to additive.
+
+### `inheritance` — discriminator-scoped reads
+
+`InheritanceSearchType` is a closed enum with three values controlling how reads scope across a [[Single-Table Inheritance|single-table-inheritance]] hierarchy:
+
+| Value | What `applyOptions` does | Emitted SQL |
+|---|---|---|
+| `ALL` (default) | Nothing — no branch in `applyOptions` for `ALL`. | None added; reads every row in the inherited table regardless of subclass. |
+| `ONLY` | Calls `setConcreteClassDiscriminator()`. | Pushes `discriminator = <self>` onto `this.conditions`. |
+| `SUBCLASSES` | Calls `setSubClassesDiscriminator()`. | Pushes `discriminator IN (...)` whose value list is `T` and every descendant in the prototype chain. |
+
+The two helpers (`setSubClassesDiscriminator`, `setConcreteClassDiscriminator`) are method-private but actually-public in effect: they **push** onto `this.conditions` rather than replacing. The order in `applyOptions` is `where` first (replaces), then inheritance (pushes), so a single `applyOptions` call cleanly ANDs the discriminator predicate onto the user's conditions.
+
+> [!key-insight] Discriminator-only-when-needed
+> The discriminator filter is only added when `meta.discriminator` is truthy — and `MetadataStorage.resolveInheritance` *wipes* the discriminator on entities alone in their table (see [[Single-Table Inheritance]]). So `userRepo.findMany({ inheritance: ONLY })` against a `User` with no subclasses is a no-op at SQL level. As soon as a sibling registers and resolution re-runs, the same call starts emitting the predicate. The option's effect depends on whether siblings exist, not just on what the caller passes.
+
+> [!warning] Footgun: double-applyOptions
+> If `applyOptions` is called twice — once with `inheritance`, once with `where` — the second call's `where` clobbers the discriminator (because `where` *replaces*, and `inheritance` was on the first call only). Always pass both fields together in a single call.
+
+Subclass discovery uses a pure prototype-chain walk against the live metadata `Map`:
+
+```ts
+for (const [t, m] of this.db.getMetadata()) {
+  if (t === this.entity ||
+      Object.prototype.isPrototypeOf.call(this.entity.prototype, t.prototype)) {
+    subclasses.push(m);
+  }
+}
+```
+
+No name strings, no manual registry. See `examples/inheritance/services/UserHierarchyService.ts` for the canonical use of `SUBCLASSES`, and [[sources/drift-d3-find-options-inheritance]] for the full documentation gap this section closes.
 
 ## Terminal Methods
 

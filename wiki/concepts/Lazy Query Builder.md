@@ -26,7 +26,7 @@ sources:
 
 ## Definition
 
-A **lazy query builder** accumulates query state — `WHERE` predicates, joins, ordering, pagination — without executing SQL. SQL is generated and run only when a terminal method is called. In OOR the type is `QueryBuilder<T>`, returned by `Repository<T>.find()`.
+A **lazy query builder** accumulates query state — `WHERE` predicates, joins, ordering, pagination — without executing SQL. SQL is generated and run only when a terminal method is called. In OOR the type is `QueryBuilder<T>`, constructed inside the repository's read methods (`findMany`, `findOne`) and discarded after one terminal call.
 
 "Lazy" here means *deferred until a terminal call*, not "evaluated only on demand by a consumer of the rows." The rows are fetched eagerly once the terminal method runs; what is deferred is the entire act of running.
 
@@ -38,7 +38,7 @@ The builder is **mutable**, single-owner, and short-lived. Today it holds exactl
 private conditions: Condition[] = [];
 ```
 
-That's it. Where-conditions and the inheritance discriminator filter both reduce to entries in this array. Future fields (ordering, pagination) would each get their own dedicated property on the class.
+That's it. Where-conditions and the inheritance discriminator filter both reduce to entries in this array — the user-facing API for the latter is the `inheritance: InheritanceSearchType` field on `FindOptions<T>` (see [[QueryBuilder]] § `applyOptions()` and [[Single-Table Inheritance]] § Reading Across the Hierarchy). Future fields (ordering, pagination) would each get their own dedicated property on the class.
 
 The repository constructs a `QueryBuilder<T>`, calls `applyOptions(options?)` to install the user's `where` callback (and any other future option), then calls a terminal method. The builder is discarded afterwards. There is no scenario today where two consumers hold the same builder.
 
@@ -78,7 +78,10 @@ const active = await userRepository.findMany({
 > [!note] Refined 2026-04-29
 > An earlier version of this page showed `where({ active: true })` taking a plain object. The actual API is a callback `(u) => [u.active!.eq(true)]` returning an array of `Condition` objects produced from a typed proxy of `FieldConditionBuilder`s. See [[Conditions Proxy]] for the proxy mechanism and [[query-lifecycle]] step 3 for where the proxy is built.
 
-When composition / layering is needed, the builder returned by `Repository.find()` (when present in the API surface) accumulates the same way: each chained call appends state, terminal methods (`getMany`, `getOne`, `getCount`) compose and execute. The lazy-execution property is the same regardless of whether you reached the builder via `find()` or via a wrapper like `findMany`.
+When composition / layering is needed today, it happens **inside** `findMany` / `findOne` via the `where` callback and the `inheritance` `FindOptions` field — the builder is constructed, accumulated, and terminated in one short-lived owner. There is no caller-facing `Repository.find()` handoff. A future API could expose the builder directly without changing the lazy-execution property; the laziness is the load-bearing invariant, not who holds the reference.
+
+> [!note] Refined 2026-04-29 (drift D1)
+> Earlier wording said "the builder returned by `Repository.find()` (when present in the API surface)" — that hedge was correct, but the broader framing implied a planned `find()` handoff. There is no such method, and the design today does not call for one. See [[sources/drift-d1-repository-find]].
 
 ## Connections
 

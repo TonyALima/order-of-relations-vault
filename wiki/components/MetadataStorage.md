@@ -44,7 +44,10 @@ A single `Map<Constructor, EntityMetadata>`, keyed by the class constructor itse
 - `columns: ColumnMetadata[]` — one entry per `@Column` / `@PrimaryColumn`. Each carries property name, mapped column name, SQL type, primary flag, nullability, and an optional `autogeneration` strategy.
 - `relations: RelationMetadata[]` — one entry per `@ToOne`. Each carries property name, relation type (`TO_ONE`), nullability, FK columns (resolved lazily), and a `getTarget()` thunk (see [[Relation Target Thunk]]).
 
-Schema names, indexes, cascading rules: deliberately absent. They'd belong on the same record but aren't needed yet — adding fields later is cheaper than removing.
+User-declarable schema names, indexes, and cascading rules are deliberately absent. They'd belong on the same record but aren't needed yet — adding fields later is cheaper than removing.
+
+> [!note] One implicit-but-real index, owned by the schema-create path
+> STI tables get an implicit `idx_discriminator` index added by `Database.create()` (alongside the discriminator column itself). It's not user-declarable and not modeled here — it lives entirely on the schema-create path. See [[schema-create-drop]] § STI emissions and [[Single-Table Inheritance]] § What schema-create emits. Documented in [[sources/drift-d5-discriminator-index]].
 
 ### Why `Map`, not per-class statics or `WeakMap`
 
@@ -86,7 +89,7 @@ After all class declarations have been evaluated, the storage is **frozen for th
 `isMetadataResolved` is the laziness flag. Every `set()` resets it to `false`. The next `get()` (or iteration) triggers two resolution passes:
 
 - **`resolveInheritance`** — for each registered class, walks `Object.getPrototypeOf(target.prototype)?.constructor` up to the topmost decorated ancestor and adopts its `tableName`. Multi-level chains collapse to one table. Discriminators are assigned per class, then **wiped** if only one class maps to a given table; a sibling registering later restores them on the next resolution pass. See [[Single-Table Inheritance]].
-- **`resolveRelations`** — for each `RelationMetadata`, calls its `getTarget()` thunk (see [[Relation Target Thunk]]) and looks up the result in the storage. If the target isn't registered, throws `RelationTargetNotFoundError`. Foreign-key column names that decorators left as `null` are filled in here.
+- **`resolveRelations`** — for each `RelationMetadata`, calls its `getTarget()` thunk (see [[Relation Target Thunk]]) and looks up the result in the storage. If the target isn't registered, throws `RelationTargetNotFoundError`. Foreign-key column names that decorators left as `null` are filled in here, and the FK column **types** are derived by calling `toForeignKeyType` on each target primary column — SERIAL/SMALLSERIAL/BIGSERIAL get demoted to their underlying integer types (see [[modules/sql-types]]).
 
 After the passes, `isMetadataResolved = true`. Subsequent reads hit the resolved cache.
 

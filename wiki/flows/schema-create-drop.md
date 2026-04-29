@@ -37,8 +37,30 @@ For each entity in metadata, emit a `CREATE TABLE` statement.
 
 - Columns come from `EntityMetadata.columns` (one DDL fragment per `ColumnMetadata`).
 - Primary-key columns are flagged via `@PrimaryColumn`; the table-level `PRIMARY KEY` clause is composed from those.
-- Class-table inheritance: tables for inherited entities include the discriminator column resolved by `resolveInheritance`.
 - Foreign-key columns from relations are emitted as plain columns at this stage — **without** the FK constraint.
+
+#### Two skip rules in `createBaseTables`
+
+```ts
+if (metadata.columns.length === 0) continue;
+if (metadata.discriminator && metadata.discriminator !== metadata.tableName) continue;
+```
+
+- **Empty-columns skip:** entities with no columns are skipped (defensive — `@Entity` already rejects classes with no primary column).
+- **STI base-table-only skip:** subclass entities (whose `tableName` was rewritten to the root's during `resolveInheritance`, so `discriminator !== tableName`) are skipped. **Only the root entity emits a `CREATE TABLE`.** This is the schema-create implementation of "STI = one table for the whole hierarchy." See [[Single-Table Inheritance]].
+
+#### STI emissions (when `metadata.discriminator !== undefined`)
+
+For an STI root, the base-tables pass emits three statements in order:
+
+1. `CREATE TABLE <tableName> (<columns>, PRIMARY KEY (...))` — same as any entity.
+2. `ALTER TABLE <tableName> ADD COLUMN discriminator TEXT NOT NULL;`
+3. `CREATE INDEX idx_discriminator ON <tableName>(discriminator);`
+
+The discriminator column **and** its index are added only when `meta.discriminator` is truthy — and `resolveInheritance` wipes the discriminator on entities alone in their table. So a single-class root gets neither the column nor the index until a sibling registers and metadata re-resolves.
+
+> [!warning] Latent index-name collision
+> `idx_discriminator` is **shared across every STI table** in a schema. Two STI hierarchies in the same schema → second `db.create()` collides on the duplicate index name. Today invisible (only one hierarchy in the examples); flagged as a known limitation.
 
 ### Pass 2 — foreign-key constraints
 

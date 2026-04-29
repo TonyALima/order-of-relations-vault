@@ -67,6 +67,12 @@ The query builder scans the returned array for `undefined` entries. If any are p
 
 This catches a common bug: `u.foo?.eq(...)` evaluated against a non-existent column produces `undefined` instead of a `Condition`. Without this check, the query would silently drop the predicate.
 
+## Step 4.5 — Inheritance discriminator (when applicable)
+
+If `options.inheritance` is `ONLY` or `SUBCLASSES` (and `meta.discriminator` is truthy — see [[Single-Table Inheritance]]), `applyOptions` **pushes** an additional condition onto `this.conditions` *after* the user's `where` array has been written. Net effect: the discriminator predicate ANDs onto the user's conditions in step 5.
+
+`ALL` is the default and emits nothing; it's a no-op branch in `applyOptions`. See [[QueryBuilder]] § `applyOptions()` for the full handling.
+
 ## Step 5 — SQL composition
 
 On `getMany()` (or implicitly when `findMany` calls it):

@@ -7,7 +7,7 @@ tags:
   - meta
   - index
 status: developing
-page_count: 40
+page_count: 52
 related: []
 sources: []
 ---
@@ -33,9 +33,10 @@ Master catalog for the **Order of Relations (OOR)** vault. Update this file on e
 
 ## Modules — `wiki/modules/`
 
-One note per major module / package / service in the codebase.
+One note per major module / package / service in the codebase. Per-leaf coverage is **partial** by design — the [[modules/_index]] explains which modules have dedicated pages and which lean on existing component / concept / flow pages.
 
-- _Module pages not yet filed; the [[modules/_index]] holds the source-tree map (8 directories cataloged with their concerns and layer assignments)._
+- [[modules/sql-types]] — `COLUMN_TYPE` enum (closed, ~50 PG types); `getColumnTypeDefinition` (only DDL fragment producer); `toForeignKeyType` (SERIAL→INTEGER FK demotion).
+- See [[modules/_index]] for the full source-tree map and the deferred-pages table.
 
 ## Components — `wiki/components/`
 
@@ -87,7 +88,17 @@ One synthesis page per item in `.raw/`.
 - [[sources/decorator-metadata-storage|Decorator Metadata Storage]] — storage shape, three-symbol scheme, lazy resolution, failure modes (2026-04-29).
 - [[sources/query-builder-design|Query Builder Design]] — mutable builder, where-callback signature, SQL-composition safety; corrects two claims (2026-04-29).
 - [[sources/repository-contract|Repository Contract]] — by-key operations, `requirePrimaryKey` gate, `create(entity: T)` type-shaped contract, autogeneration (2026-04-29).
-- ✅ All five `.raw/` sources ingested.
+- ✅ All five primary `.raw/` sources ingested.
+
+**Drift corrections (2026-04-29):**
+
+- [[sources/drift-d1-repository-find]] — `Repository.find()` does not exist; rewrite read-API framing.
+- [[sources/drift-d3-find-options-inheritance]] — document `FindOptions.inheritance` and the `InheritanceSearchType` enum.
+- [[sources/drift-d4-conditions-proxy-operators]] — fix `FieldConditionBuilder` operator inventory (no `neq` / `before` / `after`).
+- [[sources/drift-d5-discriminator-index]] — document the implicit `idx_discriminator` index emitted by schema-create.
+- [[sources/drift-m3-module-pages]] — partial close of the `wiki/modules/` backlog.
+- [[sources/drift-m5-sql-types-module]] — file `src/core/sql-types/` (the closed enum + DDL helpers + FK demotion).
+- [[sources/drift-m6-examples-pointer]] — make `examples/` visible via `wiki/examples/` front-doors.
 
 ## Entities — `wiki/entities/`
 
@@ -122,6 +133,15 @@ Ideas, patterns, frameworks (e.g., Stage-3 decorators, repository pattern, lazy 
 Top-level topic areas (e.g., ORM design, type systems, PostgreSQL).
 
 - _none yet — see [[domains/_index]]_
+
+## Examples — `wiki/examples/`
+
+Wiki front-doors for the runnable scenarios in `examples/`.
+
+- [[examples/basic-crud]] — minimum-viable CRUD (one entity, three Repository methods).
+- [[examples/inheritance]] — STI scenario; **the only place `InheritanceSearchType` is shown in use**.
+- [[examples/relations]] — `@ToOne` + FK auto-derivation + SERIAL→INTEGER demotion (stub).
+- See [[examples/_index]] for the rolling index.
 
 ## Comparisons — `wiki/comparisons/`
 

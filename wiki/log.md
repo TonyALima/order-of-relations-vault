@@ -17,6 +17,46 @@ Append-only record of every wiki operation. Newest entries on top. Never edit pa
 
 ---
 
+## 2026-04-29 — ingest | Drift correction batch (D1, D3, D4, D5, M3, M5, M6)
+
+**Sources:** seven drift-correction notes filed against the wiki after a code-vs-wiki audit.
+
+- `.raw/drift-d1-repository-find.md` (md5 `656f720d3d1cd69fd6663827c3302a06`) — `Repository.find()` does not exist
+- `.raw/drift-d3-find-options-inheritance.md` (md5 `f4cdb91af2862133474d5de6f90fde8f`) — `FindOptions.inheritance` is undocumented
+- `.raw/drift-d4-conditions-proxy-operators.md` (md5 `0b00203e2e32355276f1bcd846e2097f`) — `FieldConditionBuilder` operator inventory wrong
+- `.raw/drift-d5-discriminator-index.md` (md5 `d4ded058e75d18f8f9957cf45e4916f9`) — schema-create emits implicit `idx_discriminator`
+- `.raw/drift-m3-module-pages.md` (md5 `9490370c861910f589b0b44682c6cc96`) — `wiki/modules/` empty + miscount (8 vs 11 leaves)
+- `.raw/drift-m5-sql-types-module.md` (md5 `2648cd5e5f360e7aa158d12c74433460`) — `src/core/sql-types/` undocumented
+- `.raw/drift-m6-examples-pointer.md` (md5 `f65ab8569b84f5a5b55921bebe6e6fa9`) — `examples/` invisible to wiki
+
+**Pages created (12):**
+- Source syntheses: [[sources/drift-d1-repository-find]], [[sources/drift-d3-find-options-inheritance]], [[sources/drift-d4-conditions-proxy-operators]], [[sources/drift-d5-discriminator-index]], [[sources/drift-m3-module-pages]], [[sources/drift-m5-sql-types-module]], [[sources/drift-m6-examples-pointer]]
+- Module: [[modules/sql-types]]
+- Examples: [[examples/_index]], [[examples/basic-crud]], [[examples/inheritance]], [[examples/relations]]
+
+**Pages updated (13):**
+- [[brief]] — removed `find()` claim; added `inheritance` `FindOptions` bullet; added `COLUMN_TYPE` / FK-demotion bullet; added `examples/` row to "Where to dig deeper".
+- [[Repository]] — operations table reduced to six methods; `find() is a handoff` section rewritten as "How reads compose."
+- [[Repository Pattern]] — by-key vs. composed split rewritten without `find()`; example trimmed; refinement note added (×4 entry).
+- [[Lazy Query Builder]] — definition rewritten ("constructed inside `findMany`/`findOne`"); inheritance forward-link added to state-field paragraph; bottom paragraph rewritten with drift-D1 note.
+- [[QueryBuilder]] — `applyOptions()` section expanded with `inheritance` subsection (three values + footgun callout + key-insight on discriminator-only-when-needed).
+- [[Conditions Proxy]] — operator inventory replaced with the nine-method list; "Type-safe operators" replaced with "Type-safe values, uniform operator surface"; `before/after` example replaced with `gt`; drift-D4 refinement note added.
+- [[Single-Table Inheritance]] — added "Reading Across the Hierarchy" section; added "What Schema-Create Emits" section.
+- [[query-lifecycle]] — added Step 4.5 documenting inheritance-condition push.
+- [[MetadataStorage]] — softened "indexes deliberately absent" with the schema-create exception; resolveRelations description expanded to mention `toForeignKeyType` demotion.
+- [[schema-create-drop]] — Pass 1 expanded with the two skip rules and the STI emissions trio; latent-collision warning callout added.
+- [[Database]] — Schema lifecycle bullet 1 expanded with STI emissions.
+- [[Autogeneration]] — added "Why `SERIAL` for `dbSide` PKs" callout cross-linking [[modules/sql-types]].
+- [[Relation Target Thunk]] — "When the Thunk Is Called" step 3 expanded with `toForeignKeyType` demotion clause.
+- [[modules/_index]] — page_count 0 → 1; reframed (no longer "none yet"); added Deferred table.
+
+**Key insights:**
+- Audit established a useful pattern: `.raw/drift-*` notes preserve pre-correction claims, post-correction claims, and code citations; the synthesis pages serve as the audit trail and survive re-ingest because hashes are recorded.
+- The single biggest documentation gap (D3 — `FindOptions.inheritance`) is now closed; [[examples/inheritance]] front-doors the canonical use site.
+- The `find()` framing was load-bearing in agent-facing pages ([[brief]], [[Repository]]); removing it required rewriting the read-API mental model from "handoff + sugar" to "composition entry points."
+
+---
+
 ## 2026-04-29 — meta | add `wiki/brief.md` (agent-facing 30-second project card)
 
 **Reason:** owner needs a stable, terse, code-agent-facing single-pager that can be referenced from `../order-of-relations/CLAUDE.md`. Distinct from [[overview]] (vault navigator) and [[hot]] (volatile churn cache).

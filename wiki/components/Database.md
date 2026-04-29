@@ -46,7 +46,7 @@ This is the canonical site for the per-`Database`-not-per-library ownership rule
 
 `create()` materializes the schema in two passes (see [[schema-create-drop]]):
 
-1. Emit `CREATE TABLE` for each entity (columns + primary keys, no FKs).
+1. Emit `CREATE TABLE` for each entity (columns + primary keys, no FKs). For STI roots, also `ALTER TABLE … ADD COLUMN discriminator TEXT NOT NULL` and `CREATE INDEX idx_discriminator ON <root>(discriminator)`. Subclass entities (whose `tableName` matches the root) are skipped at this pass — STI is one table for the whole hierarchy.
 2. Emit `ALTER TABLE … ADD FOREIGN KEY` for each relation.
 
 `drop()` walks the relation graph in topological reverse so foreign-key targets are dropped after their referrers.

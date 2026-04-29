@@ -40,7 +40,7 @@ Downward dependencies only. Decorators are the only writers of metadata.
 
 1. **Decorators** — `@Entity`, `@Column`, `@PrimaryColumn`, `@Nullable`, relation decorators. Write to three symbol keys on `context.metadata`: `COLUMNS_KEY`, `RELATIONS_KEY`, `NULLABLE_KEY`.
 2. **Metadata** — [[MetadataStorage]] is **per-`Database`** (not library-global). `Map<Constructor, EntityMetadata>`, lazy-resolved, idempotent on late additions.
-3. **Repository** — narrow by-key surface. `create` / `findById` / `update` / `delete` funnel through one `requirePrimaryKey` gate. `find()` returns a `QueryBuilder`; `findOne` / `findMany` are sugar. Single error type: `IncompletePrimaryKeyError`. Driver errors propagate unwrapped.
+3. **Repository** — narrow by-key surface, six public methods total. `create` / `findById` / `update` / `delete` funnel through one `requirePrimaryKey` gate. `findOne` / `findMany` are the composition entry points (each builds a one-shot `QueryBuilder` internally; there is no caller-facing `find()`). Single error type: `IncompletePrimaryKeyError`. Driver errors propagate unwrapped.
 4. **QueryBuilder** — mutable, single-owner. State is one field: `conditions: Condition[] = []`. Two terminals: `getMany()`, `getOne()`. `applyOptions()` replaces (not accumulates).
 5. **Driver** — Bun's `sql` (PostgreSQL only).
 
@@ -49,7 +49,10 @@ Downward dependencies only. Decorators are the only writers of metadata.
 - `create(entity: T)` — signature is `T`, not `Partial<T>`. Returns `Partial<T>` with **only PK fields** (not a hydrated entity).
 - Autogeneration is **explicit-only**: two strategies (`clientSide` / `dbSide`); a caller-supplied value always wins. → [[Autogeneration]]
 - `where` callback shape: `(conditions: Conditions<T>) => (Condition | undefined)[]`. Missing-column entries throw `UndefinedWhereConditionError` carrying the offending **index**.
+- `FindOptions<T>` also accepts `inheritance: InheritanceSearchType` (`ALL` / `ONLY` / `SUBCLASSES`) — opts a read into / out of subclass-scoped discriminator filtering. See [[Single-Table Inheritance]] § Reading Across the Hierarchy.
 - DI container is **decided but not yet implemented**; current code uses direct `new Repository(User, db)`. → [[0003-singleton-di-container]]
+- **`COLUMN_TYPE` is a closed enum.** Decorators can only declare types from this enum — no string escape hatch. To support a new PostgreSQL type, add a member and a branch in `getColumnTypeDefinition`. → [[modules/sql-types]]
+- **FK columns referencing a SERIAL PK are emitted as `INTEGER`, not `SERIAL`.** Because `SERIAL` = `INTEGER` + sequence + `DEFAULT nextval(...)`, an FK that copied the type would create a bogus second sequence. `toForeignKeyType()` demotes `SERIAL`→`INTEGER`, `SMALLSERIAL`→`SMALLINT`, `BIGSERIAL`→`BIGINT` automatically; identity for every other type. Hand-written migrations against entity declarations need to mirror this. → [[modules/sql-types]] § Foreign-key type demotion
 
 ## Where to dig deeper
 
@@ -63,6 +66,7 @@ Downward dependencies only. Decorators are the only writers of metadata.
 | Repository contract                  | [[Repository]] · [[Repository Pattern]]                                                                |
 | Builder mechanics                    | [[QueryBuilder]] · [[Lazy Query Builder]] · [[Conditions Proxy]] · [[Parameterized SQL]] · [[sqlJoin]] |
 | Entity registration & metadata shape | [[MetadataStorage]] · [[Database]]                                                                     |
+| Working call sites                   | `examples/basic-crud/` · `examples/inheritance/` · `examples/relations/` — see [[examples/_index]]     |
 
 ## Open questions (do not assume resolved)
 

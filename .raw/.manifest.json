@@ -120,6 +120,123 @@
         "wiki/components/_index.md",
         "wiki/flows/_index.md"
       ]
+    },
+    ".raw/drift-d1-repository-find.md": {
+      "hash": "656f720d3d1cd69fd6663827c3302a06",
+      "ingested_at": "2026-04-29",
+      "pages_created": [
+        "wiki/sources/drift-d1-repository-find.md"
+      ],
+      "pages_updated": [
+        "wiki/components/Repository.md",
+        "wiki/concepts/Repository Pattern.md",
+        "wiki/concepts/Lazy Query Builder.md",
+        "wiki/brief.md",
+        "wiki/index.md",
+        "wiki/hot.md",
+        "wiki/log.md",
+        "wiki/sources/_index.md"
+      ]
+    },
+    ".raw/drift-d3-find-options-inheritance.md": {
+      "hash": "f4cdb91af2862133474d5de6f90fde8f",
+      "ingested_at": "2026-04-29",
+      "pages_created": [
+        "wiki/sources/drift-d3-find-options-inheritance.md"
+      ],
+      "pages_updated": [
+        "wiki/components/QueryBuilder.md",
+        "wiki/concepts/Single-Table Inheritance.md",
+        "wiki/concepts/Lazy Query Builder.md",
+        "wiki/flows/query-lifecycle.md",
+        "wiki/brief.md",
+        "wiki/index.md",
+        "wiki/hot.md",
+        "wiki/log.md",
+        "wiki/sources/_index.md"
+      ]
+    },
+    ".raw/drift-d4-conditions-proxy-operators.md": {
+      "hash": "0b00203e2e32355276f1bcd846e2097f",
+      "ingested_at": "2026-04-29",
+      "pages_created": [
+        "wiki/sources/drift-d4-conditions-proxy-operators.md"
+      ],
+      "pages_updated": [
+        "wiki/concepts/Conditions Proxy.md",
+        "wiki/index.md",
+        "wiki/hot.md",
+        "wiki/log.md",
+        "wiki/sources/_index.md"
+      ]
+    },
+    ".raw/drift-d5-discriminator-index.md": {
+      "hash": "d4ded058e75d18f8f9957cf45e4916f9",
+      "ingested_at": "2026-04-29",
+      "pages_created": [
+        "wiki/sources/drift-d5-discriminator-index.md"
+      ],
+      "pages_updated": [
+        "wiki/components/MetadataStorage.md",
+        "wiki/components/Database.md",
+        "wiki/flows/schema-create-drop.md",
+        "wiki/concepts/Single-Table Inheritance.md",
+        "wiki/index.md",
+        "wiki/hot.md",
+        "wiki/log.md",
+        "wiki/sources/_index.md"
+      ]
+    },
+    ".raw/drift-m3-module-pages.md": {
+      "hash": "9490370c861910f589b0b44682c6cc96",
+      "ingested_at": "2026-04-29",
+      "pages_created": [
+        "wiki/sources/drift-m3-module-pages.md"
+      ],
+      "pages_updated": [
+        "wiki/modules/_index.md",
+        "wiki/index.md",
+        "wiki/hot.md",
+        "wiki/log.md",
+        "wiki/sources/_index.md"
+      ]
+    },
+    ".raw/drift-m5-sql-types-module.md": {
+      "hash": "2648cd5e5f360e7aa158d12c74433460",
+      "ingested_at": "2026-04-29",
+      "pages_created": [
+        "wiki/sources/drift-m5-sql-types-module.md",
+        "wiki/modules/sql-types.md"
+      ],
+      "pages_updated": [
+        "wiki/concepts/Autogeneration.md",
+        "wiki/concepts/Relation Target Thunk.md",
+        "wiki/components/MetadataStorage.md",
+        "wiki/brief.md",
+        "wiki/modules/_index.md",
+        "wiki/index.md",
+        "wiki/hot.md",
+        "wiki/log.md",
+        "wiki/sources/_index.md"
+      ]
+    },
+    ".raw/drift-m6-examples-pointer.md": {
+      "hash": "f65ab8569b84f5a5b55921bebe6e6fa9",
+      "ingested_at": "2026-04-29",
+      "pages_created": [
+        "wiki/sources/drift-m6-examples-pointer.md",
+        "wiki/examples/_index.md",
+        "wiki/examples/basic-crud.md",
+        "wiki/examples/inheritance.md",
+        "wiki/examples/relations.md"
+      ],
+      "pages_updated": [
+        "wiki/brief.md",
+        "wiki/index.md",
+        "wiki/hot.md",
+        "wiki/log.md",
+        "wiki/sources/_index.md"
+      ]
     }
   }
 }
