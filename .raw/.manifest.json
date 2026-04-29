@@ -77,6 +77,49 @@
         "wiki/concepts/_index.md",
         "wiki/flows/_index.md"
       ]
+    },
+    ".raw/query-builder-design.md": {
+      "hash": "a98c07d43266f452d3a460c94adfac59",
+      "ingested_at": "2026-04-29",
+      "pages_created": [
+        "wiki/sources/query-builder-design.md",
+        "wiki/components/QueryBuilder.md",
+        "wiki/concepts/sqlJoin.md",
+        "wiki/questions/get-one-limit-1.md",
+        "wiki/questions/apply-options-accumulation.md"
+      ],
+      "pages_updated": [
+        "wiki/concepts/Lazy Query Builder.md",
+        "wiki/concepts/Conditions Proxy.md",
+        "wiki/flows/query-lifecycle.md",
+        "wiki/index.md",
+        "wiki/hot.md",
+        "wiki/log.md",
+        "wiki/sources/_index.md",
+        "wiki/concepts/_index.md",
+        "wiki/components/_index.md",
+        "wiki/questions/_index.md"
+      ]
+    },
+    ".raw/repository-contract.md": {
+      "hash": "d61de455c9be742ded75c7361b428c9b",
+      "ingested_at": "2026-04-29",
+      "pages_created": [
+        "wiki/sources/repository-contract.md",
+        "wiki/components/Repository.md",
+        "wiki/concepts/Autogeneration.md",
+        "wiki/flows/lifecycle-of-a-create.md"
+      ],
+      "pages_updated": [
+        "wiki/concepts/Repository Pattern.md",
+        "wiki/index.md",
+        "wiki/hot.md",
+        "wiki/log.md",
+        "wiki/sources/_index.md",
+        "wiki/concepts/_index.md",
+        "wiki/components/_index.md",
+        "wiki/flows/_index.md"
+      ]
     }
   }
 }

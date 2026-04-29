@@ -2,7 +2,7 @@
 type: domain
 title: "Questions"
 subdomain_of: ""
-page_count: 1
+page_count: 3
 created: 2026-04-29
 updated: 2026-04-29
 tags:
@@ -26,6 +26,8 @@ When an open question gets resolved, update its `status` to `answered`, fill in 
 ## Open questions
 
 - [[decorator-order-independence]] — *2026-04-29* — should `@Column` / `@Nullable` work regardless of decoration order?
+- [[get-one-limit-1]] — *2026-04-29* — should `QueryBuilder.getOne()` emit `LIMIT 1` instead of slicing client-side?
+- [[apply-options-accumulation]] — *2026-04-29* — should `QueryBuilder.applyOptions()` accumulate where-conditions instead of replacing?
 
 ## Answered questions
 

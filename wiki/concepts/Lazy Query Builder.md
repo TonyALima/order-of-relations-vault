@@ -32,27 +32,30 @@ A **lazy query builder** accumulates query state — `WHERE` predicates, joins, 
 
 ## How It Works
 
-The builder holds an internal state object:
+The builder is **mutable**, single-owner, and short-lived. Today it holds exactly one piece of internal state:
 
 ```ts
-type QueryState = {
-  wheres: Predicate[];
-  joins: Join[];
-  orderBy?: { column: string; direction: "ASC" | "DESC" };
-  limit?: number;
-  offset?: number;
-};
+private conditions: Condition[] = [];
 ```
 
-Each chained method (`where`, `andWhere`, `join`, `orderBy`, `limit`, `offset`) returns a `QueryBuilder<T>` (or a narrowed type) with the new state appended. The builder is conceptually immutable from the consumer's perspective: chaining produces a new state.
+That's it. Where-conditions and the inheritance discriminator filter both reduce to entries in this array. Future fields (ordering, pagination) would each get their own dedicated property on the class.
 
-Terminal methods compile the state to a parameterized SQL string + parameter array, hand it to the [[Bun]] `SQL` driver, and resolve with rows:
+The repository constructs a `QueryBuilder<T>`, calls `applyOptions(options?)` to install the user's `where` callback (and any other future option), then calls a terminal method. The builder is discarded afterwards. There is no scenario today where two consumers hold the same builder.
 
-- `getMany(): Promise<T[]>`
-- `getOne(): Promise<T | null>`
-- `getCount(): Promise<number>`
+`applyOptions()` **replaces** the where-conditions wholesale on every call — last-call-wins, not additive. See [[apply-options-accumulation]] for the open question on whether to flip this to accumulation.
 
-Because SQL only runs at the terminal call, intermediate builders can be passed around and layered on. A function can accept a `QueryBuilder<User>`, add `where({ active: true })`, and return it without ever having issued a query.
+The terminal methods today are exactly two:
+
+- `getMany(): Promise<T[]>` — every matching row. Empty result is `[]`, never `null`.
+- `getOne(): Promise<T | null>` — first row of `getMany()` or `null`. **Slices client-side**; does not emit `LIMIT 1` today (see [[get-one-limit-1]]).
+
+Notably absent: `getCount()`, `getExists()`, streaming. Future work — the shape `getX(): Promise<X>` is the pattern; new terminals slot in without disturbing the clause API.
+
+Because SQL only runs at the terminal call, intermediate builders can be passed to helpers that conditionally add inheritance scope or extra conditions, and the helper doesn't have to re-issue or accept already-fetched rows. *That* is what laziness buys, regardless of the mutability stance.
+
+> [!note] Refined 2026-04-29 (×2)
+> 1. Earlier framing called the builder "conceptually immutable from the consumer's perspective." That was wrong — per `.raw/query-builder-design.md`, the builder is **concretely mutable**. The deferred-execution property (laziness) is what makes composition safe, not immutability. See [[QueryBuilder]] § Mutability for the rationale.
+> 2. The terminal-methods list previously included `getCount()`. The source explicitly lists `getCount`, `getExists`, and streaming as **future work, not yet present**. Removed.
 
 ## Why It Matters
 
@@ -80,11 +83,17 @@ When composition / layering is needed, the builder returned by `Repository.find(
 ## Connections
 
 - [[0002-repository-with-lazy-query-builder]] — the ADR.
+- [[QueryBuilder]] — the concrete class realizing this concept, with the actual state field, mutability stance, and terminal methods.
 - [[Repository Pattern]] — the entry point that wraps and delegates to this type.
 - [[Conditions Proxy]] — the typed object the `where` callback receives.
 - [[query-lifecycle]] — the six-step walkthrough of a `findMany` call.
+- [[sqlJoin]] — the only sanctioned helper for joining SQL fragments at terminal time.
 - [[Parameterized SQL]] — the safety property the builder must preserve at terminal compile time.
-- [[Query Builder Design]] — clause accumulation, lazy execution, type narrowing details (page populated by a future ingest of `.raw/query-builder-design.md`).
+
+## Open Questions
+
+- [[get-one-limit-1]] — `getOne()` slicing vs `LIMIT 1`.
+- [[apply-options-accumulation]] — `applyOptions()` replace vs accumulate.
 
 ## Sources
 

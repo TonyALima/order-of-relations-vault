@@ -71,10 +71,12 @@ This catches a common bug: `u.foo?.eq(...)` evaluated against a non-existent col
 
 On `getMany()` (or implicitly when `findMany` calls it):
 
-- Each `Condition` is mapped to a tagged-template SQL fragment.
-- Operators (`=`, `<>`, `IN`, …) are pre-tokenised into a fragment table; they are **never** built from user input.
-- Values stay as parameters in the tagged-template.
-- Fragments are joined with `sqlJoin` (the only sanctioned join in the codebase).
+- Each `Condition` is mapped to a tagged-template SQL fragment of the form ``sql`${sql(c.columnName)} ${opFragments[c.op]} ${c.value}` ``.
+  - **Column name** goes through Bun's `sql(identifier)` form — safe identifier binding.
+  - **Operator** comes from a static `opFragments` map of pre-built `sql\`=\``-style fragments, keyed by a closed `Condition['op']` enum. Never built from user input.
+  - **Value** stays as a parameter in the tagged-template.
+- The `IN` operator deserves a callout: ``sql`${col} IN ${sql(c.value)}` `` — Bun's `sql(array)` form binds each element as a parameter. **Empty array** produces a valid `IN ()` that matches nothing rather than crashing. The test suite pins this.
+- Fragments are joined with [[sqlJoin]] using ``sql` AND ``` as the separator. This is the only sanctioned join in the codebase — hand-rolled `reduce` over fragments is a known footgun and is not used anywhere.
 
 There is no string concatenation of user-supplied data anywhere on this path. See [[Parameterized SQL]] and [[0004-parameterized-sql-only]].
 
@@ -97,7 +99,10 @@ The composed `sql\`SELECT … FROM … WHERE …\`` is awaited against the [[Bun
 ## See Also
 
 - [[Repository Pattern]] — the entry point.
-- [[Lazy Query Builder]] — the type that owns steps 3–5.
+- [[Lazy Query Builder]] — the concept behind steps 3–5.
+- [[QueryBuilder]] — the concrete class realizing them.
+- [[Conditions Proxy]] — the typed object built in step 3.
+- [[sqlJoin]] — the joiner used in step 5.
 - [[schema-create-drop]] — the orthogonal flow on the schema side.
 
 ## Sources

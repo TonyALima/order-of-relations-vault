@@ -17,6 +17,47 @@ Append-only record of every wiki operation. Newest entries on top. Never edit pa
 
 ---
 
+## 2026-04-29 — ingest | Repository Contract (final source)
+
+- Source: `.raw/repository-contract.md` (md5 `d61de455c9be742ded75c7361b428c9b`)
+- Summary: [[sources/repository-contract]]
+- **Pages created (4):**
+  - Source: [[sources/repository-contract]]
+  - Component: [[Repository]] (the concrete class — distinct from the [[Repository Pattern]] concept)
+  - Concept: [[Autogeneration]]
+  - Flow: [[lifecycle-of-a-create]]
+- **Pages refined (1):**
+  - [[Repository Pattern]] — split sharpened from "writes vs. reads" to "**by-key vs. composed**." `create()` signature corrected to `T` (not `Partial<T>`). Return shape clarified to `Partial<T>` with PK fields only (not a hydrated entity). New "How decorators shape the contract" subsection explaining the `NullableField<Value>` / `NotNullableField<Value>` mechanism. Third `> [!note] Refined` callout consolidates the page's three rounds of corrections.
+- **Pages updated (indexes):** [[index]], [[hot]], [[sources/_index]] (now ✅ all five), [[concepts/_index]], [[components/_index]], [[flows/_index]].
+- **Manifest:** added entry for `repository-contract.md`. **All five sources now tracked.**
+- **Vault now holds 38 pages.** Five sources, seven ADRs, four flows, four components, eleven concepts, four entities, three open questions.
+- **Closing pattern observation:** every ingest after the first refined existing pages. Concept pages saw on average 2 refinement passes each. The `.raw/`-immutable rule + dated `> [!note] Refined` callouts preserved the full audit trail without history rewriting. The wiki is now structurally consistent — no open contradictions; three open questions are deliberately deferred design choices, not unresolved facts.
+- **Two design throughlines** worth carrying forward (now from two sources, paired):
+  - QueryBuilder side: *"keep the builder small, keep the SQL parameterized, keep the types honest."*
+  - Repository side: *"these are not gaps; they are the boundary. Anything composed, reactive, or stateful goes elsewhere."*
+
+---
+
+## 2026-04-29 — ingest | Query Builder Design
+
+- Source: `.raw/query-builder-design.md` (md5 `a98c07d43266f452d3a460c94adfac59`)
+- Summary: [[sources/query-builder-design]]
+- **Pages created (5):**
+  - Source: [[sources/query-builder-design]]
+  - Component: [[QueryBuilder]] (the concrete class — distinct from the [[Lazy Query Builder]] concept page)
+  - Concept: [[sqlJoin]]
+  - Open questions: [[get-one-limit-1]], [[apply-options-accumulation]]
+- **Pages refined (3):**
+  - [[Lazy Query Builder]] — corrected from "conceptually immutable" to **mutable, single-owner**. Internal state narrowed to a single `conditions: Condition[] = []` field. Terminal-method list narrowed to `getMany`/`getOne` only (dropped `getCount` — future work). `applyOptions()` semantics documented as **replace, not accumulate** with cross-link to the open question. Second `> [!note] Refined` callout added.
+  - [[Conditions Proxy]] — exact callback signature (`(conditions: Conditions<T>) => (Condition | undefined)[]`) and the `Conditions<T>` mapped type added; the `?` partial-mapped-type rationale articulated; `UndefinedWhereConditionError` documented as carrying the offending **index**.
+  - [[query-lifecycle]] — Step 5 deepened with the `opFragments` static map, `sql(c.columnName)` identifier binding, and the `IN`-with-empty-array note. `sqlJoin` cross-linked.
+- **Pages updated (indexes):** [[index]], [[hot]], [[sources/_index]], [[concepts/_index]], [[components/_index]], [[questions/_index]].
+- **Manifest:** added entry for `query-builder-design.md`.
+- **Two new open questions filed** — both explicitly named as deferred in the source itself: `getOne` slicing vs `LIMIT 1`, and `applyOptions` replace vs accumulate. Each sketches the design space without endorsing.
+- **Key insight:** the source's "throughline" sentence is worth treating as the criterion for any future builder-API addition: *keep the builder small, keep the SQL parameterized, keep the types honest.* Recorded on [[sources/query-builder-design]] § Notes.
+
+---
+
 ## 2026-04-29 — filed | Open question: decorator-order independence
 
 - Owner observed during the `@Nullable` resolution that requiring a specific decorator order is a footgun, and asked to file the question for future resolution rather than acting on it now.

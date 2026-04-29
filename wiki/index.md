@@ -7,7 +7,7 @@ tags:
   - meta
   - index
 status: developing
-page_count: 29
+page_count: 38
 related: []
 sources: []
 ---
@@ -42,6 +42,8 @@ Reusable building blocks (decorators, query-builder fragments, container primiti
 
 - [[MetadataStorage]] — `Map<Constructor, EntityMetadata>` per `Database`.
 - [[Database]] — connection + metadata host + schema lifecycle.
+- [[QueryBuilder]] — mutable, single-owner; one `conditions[]` field; `getMany()` / `getOne()`.
+- [[Repository]] — narrow by-key surface; `requirePrimaryKey` gate; single error type.
 - See [[components/_index]] for the rolling index.
 
 ## Decisions — `wiki/decisions/`
@@ -69,6 +71,7 @@ Data flows and request paths (e.g., lifecycle of a `findMany` call).
 
 - [[entity-registration]] — decorator evaluation → `@Entity` validation → `MetadataStorage.set` → lazy resolution.
 - [[query-lifecycle]] — six-step walkthrough of a composed read.
+- [[lifecycle-of-a-create]] — seven-step walkthrough of a write (`create()` end to end).
 - [[schema-create-drop]] — two-pass `CREATE TABLE`; topologically reversed `DROP`.
 - See [[flows/_index]] for the rolling index.
 
@@ -80,8 +83,10 @@ One synthesis page per item in `.raw/`.
 
 - [[sources/welcome|Welcome to the OOR Vault]] — manifesto: pillars + 7 ADR seeds (2026-04-29).
 - [[sources/architecture-overview|Architecture Overview]] — five-layer stack, query lifecycle, schema create/drop; refines 3 claims from welcome.md (2026-04-29).
-- [[sources/decorator-metadata-storage|Decorator Metadata Storage]] — storage shape, two-symbol scheme, lazy resolution, failure modes (2026-04-29).
-- _pending ingest: `query-builder-design.md`, `repository-contract.md` — see [[sources/_index]]._
+- [[sources/decorator-metadata-storage|Decorator Metadata Storage]] — storage shape, three-symbol scheme, lazy resolution, failure modes (2026-04-29).
+- [[sources/query-builder-design|Query Builder Design]] — mutable builder, where-callback signature, SQL-composition safety; corrects two claims (2026-04-29).
+- [[sources/repository-contract|Repository Contract]] — by-key operations, `requirePrimaryKey` gate, `create(entity: T)` type-shaped contract, autogeneration (2026-04-29).
+- ✅ All five `.raw/` sources ingested.
 
 ## Entities — `wiki/entities/`
 
@@ -105,6 +110,8 @@ Ideas, patterns, frameworks (e.g., Stage-3 decorators, repository pattern, lazy 
 - [[Lazy Query Builder]] — clauses accumulate; SQL runs only on terminal calls.
 - [[Conditions Proxy]] — the typed proxy passed to a `where` callback.
 - [[Parameterized SQL]] — placeholders + bound parameters; the only allowed query form.
+- [[sqlJoin]] — the only sanctioned fragment joiner.
+- [[Autogeneration]] — explicit-only PK auto-generation; `clientSide` / `dbSide` strategies.
 - [[Dependency Injection Container]] — minimal singleton container (planned, not yet implemented).
 - See [[concepts/_index]] for the rolling index.
 
@@ -125,6 +132,8 @@ Side-by-side analyses (e.g., OOR vs TypeORM vs Drizzle).
 Filed answers to queries, plus **open questions** kept visible until resolved.
 
 - 🔓 [[decorator-order-independence]] — *open* — could `@Column` / `@Nullable` work regardless of decoration order?
+- 🔓 [[get-one-limit-1]] — *open* — `getOne()` slicing vs. `LIMIT 1`?
+- 🔓 [[apply-options-accumulation]] — *open* — `applyOptions()` replace vs. accumulate?
 - See [[questions/_index]] for the rolling index.
 
 ## Meta — `wiki/meta/`
