@@ -17,6 +17,26 @@ Append-only record of every wiki operation. Newest entries on top. Never edit pa
 
 ---
 
+## 2026-04-29 — ingest | Architecture Overview
+
+- Source: `.raw/architecture-overview.md` (md5 `4c677429220411089da13a9fb1aba575`)
+- Summary: [[sources/architecture-overview]]
+- **Pages created (7):**
+  - Source: [[sources/architecture-overview]]
+  - Flows: [[query-lifecycle]], [[schema-create-drop]]
+  - Components: [[MetadataStorage]], [[Database]]
+  - Concepts: [[Layered Architecture]], [[Conditions Proxy]]
+- **Pages refined (3 concepts + 1 ADR):**
+  - [[ECMAScript Stage-3 Decorators]] — `MetadataStorage` is per-`Database`, not library-global. The earlier "library-owned `Map`" framing was wrong; corrected with a dated `> [!note] Refined` callout.
+  - [[Repository Pattern]] — read methods (`findOne`/`findMany`/`findById`) delegate to `QueryBuilder`; only writes build SQL directly. The earlier "trivial vs. composed" split was wrong; the actual split is read vs. write. Example code rewritten to drop the aspirational `@InjectRepository` and use direct construction.
+  - [[Lazy Query Builder]] — `where` is a callback receiving a typed [[Conditions Proxy]], not a plain object. Example rewritten.
+  - [[0003-singleton-di-container]] — added `> [!warning]` implementation-status callout: DI is **not yet shipped** in `src/`; current pattern is direct construction. ADR `status` left as `accepted` (decision is made; only implementation is pending).
+- **Pages updated (indexes):** [[index]], [[hot]], [[sources/_index]], [[concepts/_index]], [[components/_index]], [[flows/_index]], [[modules/_index]] (now hosts the full source-tree map from the source).
+- **Manifest:** added entry for `architecture-overview.md`.
+- **Key insight:** this source is the **engineering reality** layer to welcome.md's manifesto. Two systematic gaps surfaced: (1) DI not yet implemented (parallel to the test-layout slip from the prior ingest), (2) `MetadataStorage` ownership over-promised in welcome. The remaining three `.raw/` files should be read with that pattern in mind.
+
+---
+
 ## 2026-04-29 — resolved | Test-layout contradiction
 
 - Owner confirmed: unit tests are colocated as `*.test.ts` next to source under `src/`; integration tests live under the top-level `tests/` directory. Both run under `bun test`.

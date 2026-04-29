@@ -2,7 +2,7 @@
 type: domain
 title: "Sources"
 subdomain_of: ""
-page_count: 1
+page_count: 2
 created: 2026-04-29
 updated: 2026-04-29
 tags:
@@ -19,9 +19,9 @@ sources: []
 One synthesis page per item in `.raw/`. Each page summarizes the source, lists its key claims, and links to every wiki page derived from it.
 
 > [!gap] Pending ingest
-> `.raw/` currently holds five hand-written design notes. **One ingested**, four pending:
+> `.raw/` currently holds five hand-written design notes. **Two ingested**, three pending:
 > - ✅ `welcome.md` → [[sources/welcome]]
-> - `architecture-overview.md`
+> - ✅ `architecture-overview.md` → [[sources/architecture-overview]]
 > - `decorator-metadata-storage.md`
 > - `query-builder-design.md`
 > - `repository-contract.md`
@@ -29,3 +29,4 @@ One synthesis page per item in `.raw/`. Each page summarizes the source, lists i
 ## Source pages
 
 - [[sources/welcome|Welcome to the OOR Vault]] — manifesto: pillars + 7 ADR seeds. (2026-04-29)
+- [[sources/architecture-overview|Architecture Overview]] — five-layer stack, query lifecycle, schema create/drop; corrects three claims from welcome.md. (2026-04-29)

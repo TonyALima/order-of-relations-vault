@@ -62,20 +62,27 @@ Because SQL only runs at the terminal call, intermediate builders can be passed 
 
 ## Examples
 
+Actual API per `.raw/architecture-overview.md` — `where` is a callback that receives a typed [[Conditions Proxy|conditions proxy]], not a plain object:
+
 ```ts
-// Build, then layer, then run.
-const baseQuery = userRepo.find().where({ deletedAt: null });
-
-const activeQuery = baseQuery.where({ active: true }).orderBy("createdAt", "DESC");
-
-const recent = await activeQuery.limit(10).getMany(); // <-- SQL fires here
-const total = await activeQuery.getCount();           // <-- and here, separately
+// `findMany` is a thin Repository wrapper that constructs a QueryBuilder,
+// applies options, and calls getMany() internally. SQL fires once, on getMany.
+const active = await userRepository.findMany({
+  where: (u) => [u.active!.eq(true), u.deletedAt!.eq(null)],
+});
 ```
+
+> [!note] Refined 2026-04-29
+> An earlier version of this page showed `where({ active: true })` taking a plain object. The actual API is a callback `(u) => [u.active!.eq(true)]` returning an array of `Condition` objects produced from a typed proxy of `FieldConditionBuilder`s. See [[Conditions Proxy]] for the proxy mechanism and [[query-lifecycle]] step 3 for where the proxy is built.
+
+When composition / layering is needed, the builder returned by `Repository.find()` (when present in the API surface) accumulates the same way: each chained call appends state, terminal methods (`getMany`, `getOne`, `getCount`) compose and execute. The lazy-execution property is the same regardless of whether you reached the builder via `find()` or via a wrapper like `findMany`.
 
 ## Connections
 
 - [[0002-repository-with-lazy-query-builder]] — the ADR.
-- [[Repository Pattern]] — the entry point that returns this type.
+- [[Repository Pattern]] — the entry point that wraps and delegates to this type.
+- [[Conditions Proxy]] — the typed object the `where` callback receives.
+- [[query-lifecycle]] — the six-step walkthrough of a `findMany` call.
 - [[Parameterized SQL]] — the safety property the builder must preserve at terminal compile time.
 - [[Query Builder Design]] — clause accumulation, lazy execution, type narrowing details (page populated by a future ingest of `.raw/query-builder-design.md`).
 

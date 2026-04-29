@@ -7,7 +7,7 @@ tags:
   - meta
   - index
 status: developing
-page_count: 17
+page_count: 24
 related: []
 sources: []
 ---
@@ -34,13 +34,15 @@ Master catalog for the **Order of Relations (OOR)** vault. Update this file on e
 
 One note per major module / package / service in the codebase.
 
-- _none yet — see [[modules/_index]]_
+- _Module pages not yet filed; the [[modules/_index]] holds the source-tree map (8 directories cataloged with their concerns and layer assignments)._
 
 ## Components — `wiki/components/`
 
 Reusable building blocks (decorators, query-builder fragments, container primitives).
 
-- _none yet — see [[components/_index]]_
+- [[MetadataStorage]] — `Map<Constructor, EntityMetadata>` per `Database`.
+- [[Database]] — connection + metadata host + schema lifecycle.
+- See [[components/_index]] for the rolling index.
 
 ## Decisions — `wiki/decisions/`
 
@@ -65,7 +67,9 @@ External packages, runtime deps, version pins, risk.
 
 Data flows and request paths (e.g., lifecycle of a `findMany` call).
 
-- _none yet — see [[flows/_index]]_
+- [[query-lifecycle]] — six-step walkthrough of a composed read.
+- [[schema-create-drop]] — two-pass `CREATE TABLE`; topologically reversed `DROP`.
+- See [[flows/_index]] for the rolling index.
 
 ---
 
@@ -74,7 +78,8 @@ Data flows and request paths (e.g., lifecycle of a `findMany` call).
 One synthesis page per item in `.raw/`.
 
 - [[sources/welcome|Welcome to the OOR Vault]] — manifesto: pillars + 7 ADR seeds (2026-04-29).
-- _pending ingest: `architecture-overview.md`, `decorator-metadata-storage.md`, `query-builder-design.md`, `repository-contract.md` — see [[sources/_index]]._
+- [[sources/architecture-overview|Architecture Overview]] — five-layer stack, query lifecycle, schema create/drop; refines 3 claims from welcome.md (2026-04-29).
+- _pending ingest: `decorator-metadata-storage.md`, `query-builder-design.md`, `repository-contract.md` — see [[sources/_index]]._
 
 ## Entities — `wiki/entities/`
 
@@ -90,11 +95,13 @@ People, organizations, products, repos, libraries that show up in the work.
 
 Ideas, patterns, frameworks (e.g., Stage-3 decorators, repository pattern, lazy query builder).
 
+- [[Layered Architecture]] — five-layer stack; downward-only dependencies.
 - [[ECMAScript Stage-3 Decorators]] — the standardized decorator dialect.
 - [[Repository Pattern]] — `Repository<T>` as persistence entry point.
 - [[Lazy Query Builder]] — clauses accumulate; SQL runs only on terminal calls.
+- [[Conditions Proxy]] — the typed proxy passed to a `where` callback.
 - [[Parameterized SQL]] — placeholders + bound parameters; the only allowed query form.
-- [[Dependency Injection Container]] — minimal singleton container.
+- [[Dependency Injection Container]] — minimal singleton container (planned, not yet implemented).
 - See [[concepts/_index]] for the rolling index.
 
 ## Domains — `wiki/domains/`

@@ -30,6 +30,33 @@
         "wiki/entities/_index.md",
         "wiki/decisions/_index.md"
       ]
+    },
+    ".raw/architecture-overview.md": {
+      "hash": "4c677429220411089da13a9fb1aba575",
+      "ingested_at": "2026-04-29",
+      "pages_created": [
+        "wiki/sources/architecture-overview.md",
+        "wiki/flows/query-lifecycle.md",
+        "wiki/flows/schema-create-drop.md",
+        "wiki/components/MetadataStorage.md",
+        "wiki/components/Database.md",
+        "wiki/concepts/Layered Architecture.md",
+        "wiki/concepts/Conditions Proxy.md"
+      ],
+      "pages_updated": [
+        "wiki/concepts/ECMAScript Stage-3 Decorators.md",
+        "wiki/concepts/Repository Pattern.md",
+        "wiki/concepts/Lazy Query Builder.md",
+        "wiki/decisions/0003-singleton-di-container.md",
+        "wiki/index.md",
+        "wiki/hot.md",
+        "wiki/log.md",
+        "wiki/sources/_index.md",
+        "wiki/concepts/_index.md",
+        "wiki/components/_index.md",
+        "wiki/flows/_index.md",
+        "wiki/modules/_index.md"
+      ]
     }
   }
 }

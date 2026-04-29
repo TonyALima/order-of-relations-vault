@@ -40,7 +40,13 @@ A Stage-3 decorator's signature is `(value, context) => replacement`. The `conte
 
 This differs sharply from the legacy form, which received `(target, propertyKey, descriptor)` and relied on `Reflect.defineMetadata` to thread metadata between decorators.
 
-In OOR, the absence of `Reflect.metadata` is filled by an in-library `metadataStorage` `Map`. Each `@Entity` / `@Column` writes into that map under a key derived from the class constructor; the `Repository` reads back from it.
+In OOR, the absence of `Reflect.metadata` is filled by:
+
+1. **`context.metadata`** — Stage-3's per-class metadata bag, used as a *write-time buffer*. Field decorators (`@Column`, `@PrimaryColumn`, `@ToOne`, `@Nullable`, `@NotNullable`) push into `context.metadata` under private symbol keys (`COLUMNS_KEY`, `RELATIONS_KEY`, `NULLABLE_KEY`).
+2. **A `Map<Constructor, EntityMetadata>` owned by a [[Database]] instance** — the durable store. The `@Entity(db)` class decorator runs *after* all field decorators (per the language spec), pulls the buffered arrays out of `context.metadata`, and flushes a finalized `EntityMetadata` into `db.getMetadata()` (see [[MetadataStorage]]).
+
+> [!note] Refined 2026-04-29
+> An earlier version of this page said the `Map` was "owned by the library." Per `.raw/architecture-overview.md`, the storage is **per-`Database`**, not per-library — `@Entity(db)` takes the database as an argument. Two databases in the same process means two metadata maps. The library does not own a global singleton.
 
 ## Why It Matters
 
@@ -77,7 +83,9 @@ function Entity(target: Function) {
 ## Connections
 
 - [[0001-stage-3-decorators]] — the ADR fixing this choice for OOR.
-- [[Decorator Metadata Storage]] — the in-library `Map` that replaces `Reflect.metadata` (page populated by a future ingest).
+- [[MetadataStorage]] — the per-`Database` `Map` that replaces `Reflect.metadata`.
+- [[Decorator Metadata Storage]] — deeper symbol-key layout (page populated by a future ingest of `.raw/decorator-metadata-storage.md`).
+- [[Database]] — the owner of `MetadataStorage`; takes `@Entity(db)` as its registration argument.
 - [[TypeScript]] — host language; Stage-3 decorators require TS 5.0+.
 
 ## Sources

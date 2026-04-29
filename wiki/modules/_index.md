@@ -8,22 +8,46 @@ updated: 2026-04-29
 tags:
   - meta
   - modules
-status: seed
+status: developing
 related:
   - "[[index]]"
-sources: []
+  - "[[Layered Architecture]]"
+sources:
+  - "../.raw/architecture-overview.md"
 ---
 
 # Modules
 
-One note per major module / package / service in the OOR codebase. Each entry should map to a real directory or top-level concern under `src/`.
+One note per major module / package / service in the OOR codebase. Each entry maps to a real directory under [[order-of-relations]]'s `src/`.
 
-> [!gap] No modules ingested yet
-> Run an ingest pass over `.raw/architecture-overview.md` to seed initial module pages: `decorators`, `repository`, `query-builder`, `container`, `migrations`, `database`.
+> Module pages themselves are not yet filed — but the source-tree map below is the authoritative catalog of which directory holds what, ingested from `.raw/architecture-overview.md` § "Source Tree, by Concern." Use it as a routing guide.
+
+## Source-tree map
+
+| Path | Concern | Direction |
+|---|---|---|
+| `src/decorators/` | Every decorator (`@Entity`, `@Column`, `@PrimaryColumn`, `@ToOne`, `@Nullable`, `@NotNullable`). Writes only to `context.metadata` and (for `@Entity`) the database's metadata storage. | Layer 1 (writers) |
+| `src/core/metadata/` | [[MetadataStorage]], resolved `EntityMetadata` / `ColumnMetadata` / `RelationMetadata` types, `resolveInheritance` and `resolveRelations` passes. | Layer 2 |
+| `src/core/database/` | [[Database]]: Bun `SQL` connection wrapper, schema `create()` / `drop()`, FK-aware drop ordering. | Layer 5 (wire edge) |
+| `src/core/repository/` | `Repository<T>`: entity-shaped CRUD surface, primary-key validation, write-path SQL. | Layer 3 |
+| `src/core/sql-types/` | `COLUMN_TYPE` enum and the SQL fragment each type maps to. | Shared |
+| `src/core/utils/` | `sqlJoin` (the only sanctioned way to join SQL fragments) and shared types. | Shared |
+| `src/query-builder/` | `QueryBuilder<T>`: [[Conditions Proxy]], `FindOptions`, inheritance search modes. | Layer 4 |
+| `src/errors.ts` + per-module `*.errors.ts` | Every error type extends a single `OrmError` base, exported from the package root. | Cross-cutting |
+
+## The layering rule (operational form)
+
+Per [[Layered Architecture]]:
+
+- **Writers of metadata** go in `decorators/`.
+- **Readers of metadata** go in `core/` or `query-builder/`.
+- **Nothing under `core/metadata/` is allowed to import from above.**
+
+When in doubt about where new code belongs, the import direction makes the answer mechanical.
 
 ## Module pages
 
-- _none yet_
+- _none yet — pending deeper ingests of `.raw/decorator-metadata-storage.md`, `.raw/query-builder-design.md`, `.raw/repository-contract.md`._
 
 ## Frontmatter for module pages
 

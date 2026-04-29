@@ -24,6 +24,16 @@ sources:
 
 # ADR 0003 — Singleton DI container, intentionally minimal
 
+> [!warning] Implementation status: not yet shipped (as of 2026-04-29)
+> Per `.raw/architecture-overview.md` § "Services and Dependency Injection," the implementation in `../order-of-relations/src/` does **not yet** ship a `Container`, `@Service`, `@Inject`, or `@InjectRepository`. Current `examples/` use direct construction:
+>
+> ```ts
+> export const db = new Database();
+> const userRepository = new Repository(User, db);
+> ```
+>
+> This ADR describes the **intended** design — the boundary it commits to (container above persistence; repositories constructible without it). When DI lands, this callout should be removed and the ADR's `status` advanced to `accepted` and dated.
+
 ## Context
 
 Repositories need to be wired into services. Three positions are available:
@@ -55,6 +65,7 @@ Position 1 is unergonomic past two services. Position 2 imports a major dependen
 ### Neutral
 
 - Sets a clear scope: the container exists for repository injection. If it accumulates features beyond that, that is a smell to push back on.
+- The intended boundary, when DI lands, is that the container sits **above** the persistence layer — it composes services and hands them repositories — and never participates in metadata resolution or SQL execution. Repositories must remain constructible without the container so tests and one-off scripts don't pay for it. (Per `.raw/architecture-overview.md`.)
 
 ## Alternatives Considered
 
