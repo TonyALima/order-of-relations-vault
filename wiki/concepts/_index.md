@@ -2,7 +2,7 @@
 type: domain
 title: "Concepts"
 subdomain_of: ""
-page_count: 7
+page_count: 9
 created: 2026-04-29
 updated: 2026-04-29
 tags:
@@ -22,6 +22,8 @@ Ideas, patterns, and frameworks. A concept page defines what something is and wh
 
 - [[Layered Architecture]] — the five-layer stack and the downward-only dependency rule.
 - [[ECMAScript Stage-3 Decorators]] — the standardized decorator dialect OOR uses; replaces `experimentalDecorators` + `reflect-metadata`.
+- [[Single-Table Inheritance]] — discriminator-based inheritance resolved lazily on first read of `MetadataStorage`.
+- [[Relation Target Thunk]] — `() => User` closures defer constructor lookup past the temporal dead zone.
 - [[Repository Pattern]] — `Repository<T>` as the per-entity persistence entry point; reads delegate to `QueryBuilder`.
 - [[Lazy Query Builder]] — `QueryBuilder<T>` accumulates clauses; SQL runs only on terminal calls.
 - [[Conditions Proxy]] — the typed proxy of `FieldConditionBuilder`s passed to a `where` callback.
@@ -29,4 +31,4 @@ Ideas, patterns, and frameworks. A concept page defines what something is and wh
 - [[Dependency Injection Container]] — minimal singleton container for `@Service` / `@InjectRepository` wiring (planned, not yet implemented).
 
 > [!gap] Still to come
-> Deep-dive concepts on `Metadata storage layout`, `Schema migrations`, `Type narrowing`, `Class-table inheritance` — populated as the remaining `.raw/` notes are ingested.
+> `Schema migrations` (deeper than `[[schema-create-drop]]`), `Type narrowing in the query builder`, `Repository contract details` — populated as the remaining two `.raw/` notes are ingested.

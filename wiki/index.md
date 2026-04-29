@@ -7,7 +7,7 @@ tags:
   - meta
   - index
 status: developing
-page_count: 24
+page_count: 28
 related: []
 sources: []
 ---
@@ -67,6 +67,7 @@ External packages, runtime deps, version pins, risk.
 
 Data flows and request paths (e.g., lifecycle of a `findMany` call).
 
+- [[entity-registration]] — decorator evaluation → `@Entity` validation → `MetadataStorage.set` → lazy resolution.
 - [[query-lifecycle]] — six-step walkthrough of a composed read.
 - [[schema-create-drop]] — two-pass `CREATE TABLE`; topologically reversed `DROP`.
 - See [[flows/_index]] for the rolling index.
@@ -79,7 +80,8 @@ One synthesis page per item in `.raw/`.
 
 - [[sources/welcome|Welcome to the OOR Vault]] — manifesto: pillars + 7 ADR seeds (2026-04-29).
 - [[sources/architecture-overview|Architecture Overview]] — five-layer stack, query lifecycle, schema create/drop; refines 3 claims from welcome.md (2026-04-29).
-- _pending ingest: `decorator-metadata-storage.md`, `query-builder-design.md`, `repository-contract.md` — see [[sources/_index]]._
+- [[sources/decorator-metadata-storage|Decorator Metadata Storage]] — storage shape, two-symbol scheme, lazy resolution, failure modes (2026-04-29).
+- _pending ingest: `query-builder-design.md`, `repository-contract.md` — see [[sources/_index]]._
 
 ## Entities — `wiki/entities/`
 
@@ -97,6 +99,8 @@ Ideas, patterns, frameworks (e.g., Stage-3 decorators, repository pattern, lazy 
 
 - [[Layered Architecture]] — five-layer stack; downward-only dependencies.
 - [[ECMAScript Stage-3 Decorators]] — the standardized decorator dialect.
+- [[Single-Table Inheritance]] — discriminator-based inheritance, lazily resolved.
+- [[Relation Target Thunk]] — `() => User` closure pattern for circular entity graphs.
 - [[Repository Pattern]] — `Repository<T>` as persistence entry point.
 - [[Lazy Query Builder]] — clauses accumulate; SQL runs only on terminal calls.
 - [[Conditions Proxy]] — the typed proxy passed to a `where` callback.

@@ -17,6 +17,42 @@ Append-only record of every wiki operation. Newest entries on top. Never edit pa
 
 ---
 
+## 2026-04-29 — resolved | `@Nullable` write path (three symbols)
+
+- Owner pointed to `src/decorators/nullable/nullable.ts` and `src/decorators/column/column.ts` in [[order-of-relations]]. Code spot-check confirmed:
+  - `NULLABLE_KEY = Symbol('nullable')` is declared in `nullable.ts` (line 1).
+  - `@Nullable` / `@NotNullable` write `Map<string, boolean>` keyed by property name.
+  - `@Column` reads it (lines 31–37) and throws `MissingNullabilityDecoratorError` if no entry; `@PrimaryColumn` is exempt.
+  - Decorator-order constraint: `@Nullable` must be the *inner* decorator (closer to the property) so Stage-3's bottom-up application order runs it before `@Column`.
+- **Resolution shape:** `architecture-overview.md` was correct; `decorator-metadata-storage.md` had elided `NULLABLE_KEY` because its scope was "what flows into `MetadataStorage`" and `NULLABLE_KEY` is consumed by `@Column` before reaching storage. Both `.raw/` files remain immutable; the wiki corrects in place.
+- **Pages updated:**
+  - [[ECMAScript Stage-3 Decorators]] — restored to three symbols; added a `> [!warning]` decorator-order callout with a working/broken example; consolidated the two earlier "Refined" notes into a single "History of refinements" callout.
+  - [[MetadataStorage]] — replaced the single-paragraph write-path with a three-row table (key / shape / writers / readers); added `MissingNullabilityDecoratorError` to the failure-mode table; downgraded the `> [!contradiction]` callout to a `> [!note] Resolved`.
+  - [[entity-registration]] — Step 1 rewritten to cover all three keys and the inner-decorator constraint; new `> [!warning]` callout with the working/broken example; failure-mode table gained the `MissingNullabilityDecoratorError` row.
+  - [[sources/decorator-metadata-storage]] — "Open Disagreement" section converted to "Resolved disagreement" with the code-line citations and the rationale for the elision.
+  - [[hot]] — moved from "Open Contradictions" to "Recently Resolved"; key-recent-facts updated to three symbols and the order-matters constraint.
+- **Lesson** (worth carrying into the remaining two ingests): when one source is *narrower in scope* than another, "more specific within its scope" doesn't mean "more authoritative overall." For symbol keys / decorator wiring, prefer the source that explicitly enumerates the decorator file paths (`architecture-overview.md`'s "How Decorators Talk" section) over one that focuses on a downstream consumer.
+
+---
+
+## 2026-04-29 — ingest | Decorator Metadata Storage
+
+- Source: `.raw/decorator-metadata-storage.md` (md5 `c8c1b3f941bb11d046eff106c4c0af58`)
+- Summary: [[sources/decorator-metadata-storage]]
+- **Pages created (4):**
+  - Source: [[sources/decorator-metadata-storage]]
+  - Flow: [[entity-registration]]
+  - Concepts: [[Single-Table Inheritance]], [[Relation Target Thunk]]
+- **Pages refined (2):**
+  - [[ECMAScript Stage-3 Decorators]] — corrected to **two** symbol keys (`COLUMNS_KEY`, `RELATIONS_KEY`); the earlier "three symbols including `NULLABLE_KEY`" framing came from `architecture-overview.md` and is contradicted by this source's explicit code. Added second `> [!note] Refined` callout.
+  - [[MetadataStorage]] — same two-symbol correction; deepened with `isMetadataResolved` flag, idempotent re-resolution, WeakMap rationale, `getTarget` thunk, and a full failure-mode table (`MissingPrimaryColumnError`, `RelationTargetNotFoundError`, deliberate-`undefined` for unregistered classes). Added `> [!contradiction]` callout for the inter-source disagreement.
+- **Pages updated (indexes):** [[index]], [[hot]], [[sources/_index]], [[concepts/_index]], [[flows/_index]].
+- **Manifest:** added entry for `decorator-metadata-storage.md`.
+- **New contradiction surfaced:** `architecture-overview.md` claimed `@Nullable` populates a third `NULLABLE_KEY` symbol; this source shows only two symbols and an `@Entity` body that doesn't read a third. Both `.raw/` files immutable. Wiki commits to the two-symbol claim (this source is more specific) and flags the disagreement on [[MetadataStorage]] and [[sources/decorator-metadata-storage]] for resolution by code spot-check or a future ingest.
+- **Key insight:** the "manifesto vs. engineering reality" pattern continues — this is the third source-pair disagreement (after test-layout and DI-presence). The ingest pattern that emerges: each new source can refine *and* contradict prior sources; resolutions accumulate on the wiki page rather than backfilling into immutable `.raw/` files.
+
+---
+
 ## 2026-04-29 — ingest | Architecture Overview
 
 - Source: `.raw/architecture-overview.md` (md5 `4c677429220411089da13a9fb1aba575`)

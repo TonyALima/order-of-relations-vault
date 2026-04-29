@@ -57,6 +57,26 @@
         "wiki/flows/_index.md",
         "wiki/modules/_index.md"
       ]
+    },
+    ".raw/decorator-metadata-storage.md": {
+      "hash": "c8c1b3f941bb11d046eff106c4c0af58",
+      "ingested_at": "2026-04-29",
+      "pages_created": [
+        "wiki/sources/decorator-metadata-storage.md",
+        "wiki/flows/entity-registration.md",
+        "wiki/concepts/Single-Table Inheritance.md",
+        "wiki/concepts/Relation Target Thunk.md"
+      ],
+      "pages_updated": [
+        "wiki/concepts/ECMAScript Stage-3 Decorators.md",
+        "wiki/components/MetadataStorage.md",
+        "wiki/index.md",
+        "wiki/hot.md",
+        "wiki/log.md",
+        "wiki/sources/_index.md",
+        "wiki/concepts/_index.md",
+        "wiki/flows/_index.md"
+      ]
     }
   }
 }

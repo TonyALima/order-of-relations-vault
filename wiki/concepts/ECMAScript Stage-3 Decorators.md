@@ -42,11 +42,40 @@ This differs sharply from the legacy form, which received `(target, propertyKey,
 
 In OOR, the absence of `Reflect.metadata` is filled by:
 
-1. **`context.metadata`** — Stage-3's per-class metadata bag, used as a *write-time buffer*. Field decorators (`@Column`, `@PrimaryColumn`, `@ToOne`, `@Nullable`, `@NotNullable`) push into `context.metadata` under private symbol keys (`COLUMNS_KEY`, `RELATIONS_KEY`, `NULLABLE_KEY`).
-2. **A `Map<Constructor, EntityMetadata>` owned by a [[Database]] instance** — the durable store. The `@Entity(db)` class decorator runs *after* all field decorators (per the language spec), pulls the buffered arrays out of `context.metadata`, and flushes a finalized `EntityMetadata` into `db.getMetadata()` (see [[MetadataStorage]]).
+1. **`context.metadata`** — Stage-3's per-class metadata bag, used as a *write-time buffer*. Field decorators push into it under **three** private symbol keys, each with a different shape:
+    ```ts
+    const COLUMNS_KEY   = Symbol('columns');    // ColumnMetadata[]
+    const RELATIONS_KEY = Symbol('relations');  // RelationMetadata[]
+    const NULLABLE_KEY  = Symbol('nullable');   // Map<string, boolean>
+    ```
+   `@Column` / `@PrimaryColumn` push onto `COLUMNS_KEY`. `@ToOne` pushes onto `RELATIONS_KEY`. `@Nullable` and `@NotNullable` set entries on the `NULLABLE_KEY` map (property name → `true` / `false`). The `NULLABLE_KEY` bucket is a **peer-to-peer channel between sibling decorators**: `@Column` reads it at registration time, but `@Entity` does not.
+2. **A `Map<Constructor, EntityMetadata>` owned by a [[Database]] instance** — the durable store. The `@Entity(db)` class decorator runs *after* all field decorators (per the language spec), pulls `COLUMNS_KEY` and `RELATIONS_KEY` out of `context.metadata`, validates that at least one column is `primary` (else throws `MissingPrimaryColumnError`), and flushes a finalized `EntityMetadata` into `db.getMetadata()` (see [[MetadataStorage]] and the [[entity-registration]] flow). `NULLABLE_KEY` has already been consumed by the field decorators by this point; it doesn't reach storage.
 
-> [!note] Refined 2026-04-29
-> An earlier version of this page said the `Map` was "owned by the library." Per `.raw/architecture-overview.md`, the storage is **per-`Database`**, not per-library — `@Entity(db)` takes the database as an argument. Two databases in the same process means two metadata maps. The library does not own a global singleton.
+The `context.metadata` bag is **fresh per class** — Stage-3 does not propagate it across subclass declarations. Inheritance is reconstructed at storage-resolution time by walking the prototype chain (see [[Single-Table Inheritance]]).
+
+> [!warning] Decorator order matters: `@Nullable` must be inner
+> Stage-3 decorators are applied **bottom-up** on a field — the decorator closest to the property runs first. Because `@Column` reads `NULLABLE_KEY` and throws `MissingNullabilityDecoratorError` if the property's entry is missing, `@Nullable` (or `@NotNullable`) must populate the bucket *before* `@Column` runs.
+>
+> ```ts
+> // ✅ Works — @Nullable is inner (runs first), then @Column reads its entry.
+> @Column({ type: COLUMN_TYPE.TEXT })
+> @Nullable
+> nickname?: string;
+>
+> // ❌ Throws MissingNullabilityDecoratorError — @Column is inner (runs first),
+> //    NULLABLE_KEY has no entry for `nickname` yet.
+> @Nullable
+> @Column({ type: COLUMN_TYPE.TEXT })
+> nickname?: string;
+> ```
+>
+> `@PrimaryColumn` is exempt: it forces `nullable: false` and skips the `NULLABLE_KEY` lookup entirely.
+
+> [!note] History of refinements (2026-04-29)
+> This page absorbed three corrections in one day:
+> 1. The storage is **per-`Database`**, not library-global. Per `.raw/architecture-overview.md`.
+> 2. The symbol-key list was first claimed to be three, then "corrected" to two (per `.raw/decorator-metadata-storage.md`'s narrower framing), then **re-corrected back to three** after a code spot-check (`src/decorators/nullable/nullable.ts` and `src/decorators/column/column.ts` in [[order-of-relations]]) confirmed the third bucket exists. The decorator-metadata-storage source had elided `NULLABLE_KEY` because it focuses on what flows into the storage `Map`; `NULLABLE_KEY` is consumed by `@Column` and never reaches storage. See [[sources/decorator-metadata-storage]] § "Resolved disagreement" for the trail.
+> 3. The order constraint above was added on the same code spot-check.
 
 ## Why It Matters
 
@@ -84,7 +113,9 @@ function Entity(target: Function) {
 
 - [[0001-stage-3-decorators]] — the ADR fixing this choice for OOR.
 - [[MetadataStorage]] — the per-`Database` `Map` that replaces `Reflect.metadata`.
-- [[Decorator Metadata Storage]] — deeper symbol-key layout (page populated by a future ingest of `.raw/decorator-metadata-storage.md`).
+- [[entity-registration]] — the end-to-end flow turning a decorated class into an `EntityMetadata` entry.
+- [[Single-Table Inheritance]] — what reconstructs inheritance at resolution time, since `context.metadata` doesn't propagate.
+- [[Relation Target Thunk]] — the closure pattern that breaks circular-reference TDZ at decoration time.
 - [[Database]] — the owner of `MetadataStorage`; takes `@Entity(db)` as its registration argument.
 - [[TypeScript]] — host language; Stage-3 decorators require TS 5.0+.
 
