@@ -2,7 +2,7 @@
 type: domain
 title: "Questions"
 subdomain_of: ""
-page_count: 3
+page_count: 6
 created: 2026-04-29
 updated: 2026-04-29
 tags:
@@ -37,6 +37,8 @@ The live, sortable view is at [[issues|Issue tracker]] (`wiki/meta/issues.base`)
 
 | Question | Impact | Effort |
 |---|---|---|
+| [[support-one-to-many]] — implement `@OneToMany` / `@ManyToOne` (the `TO_MANY` enum member is currently dead) | high | L |
+| [[support-many-to-many]] — implement `@ManyToMany` with synthesized join table | medium | L |
 | [[decorator-order-independence]] — `@Column` / `@Nullable` order independence | medium | S |
 | [[support-user-indexes]] — add `@Index` / `@Unique`; emit `CREATE INDEX` from schema-create | medium | M |
 | [[get-one-limit-1]] — `getOne()` `LIMIT 1` vs slice | low | S |
