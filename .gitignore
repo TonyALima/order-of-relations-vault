@@ -1,0 +1,11 @@
+# Obsidian — local session state
+.obsidian/workspace.json
+.obsidian/workspace-mobile.json
+.obsidian/cache
+.obsidian/plugins/*/data.json
+
+# Obsidian — trash and local-only
+.trash/
+
+# macOS
+.DS_Store
