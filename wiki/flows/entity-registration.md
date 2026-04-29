@@ -54,6 +54,8 @@ const NULLABLE_KEY  = Symbol('nullable');   // Map<string, boolean>
 > ```
 >
 > Reversing them throws `MissingNullabilityDecoratorError` at decoration time. `@PrimaryColumn` is exempt.
+>
+> **Open question:** [[decorator-order-independence]] tracks whether to redesign so both orderings work.
 
 ### Step 2 — Class decorator runs
 

@@ -17,6 +17,22 @@ Append-only record of every wiki operation. Newest entries on top. Never edit pa
 
 ---
 
+## 2026-04-29 — filed | Open question: decorator-order independence
+
+- Owner observed during the `@Nullable` resolution that requiring a specific decorator order is a footgun, and asked to file the question for future resolution rather than acting on it now.
+- Pages created: [[decorator-order-independence]] — `status: open`. Sketches three design approaches (defer-to-`@Entity`, mutual write-time lookup, `addInitializer` deferral) with tradeoffs; identifies the codebase change surface (`column.ts`, `entity.ts`, tests, two `> [!warning]` callouts to flip).
+- Pages updated:
+  - [[questions/_index]] — reframed: "filed answers" + "open questions"; added the new entry under "Open questions."
+  - [[index]] — Questions section now lists the open question with a 🔓 marker.
+  - [[ECMAScript Stage-3 Decorators]] and [[entity-registration]] — both `> [!warning]` callouts now mention the open question, so a reader hitting the order constraint sees that it's a known design-review point.
+  - [[hot]] — new "Open Questions" section so future sessions surface this immediately.
+- Resolution criteria for closing this question (when it's eventually decided):
+  - Pick an option from the design space.
+  - If the chosen option requires a non-trivial change to decorator wiring, file an ADR under `wiki/decisions/` and link it from the question.
+  - Update the question's `status` from `open` to `answered`, fill in the **Answer** section, and move it under the "Answered questions" heading in [[questions/_index]].
+
+---
+
 ## 2026-04-29 — resolved | `@Nullable` write path (three symbols)
 
 - Owner pointed to `src/decorators/nullable/nullable.ts` and `src/decorators/column/column.ts` in [[order-of-relations]]. Code spot-check confirmed:

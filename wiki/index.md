@@ -7,7 +7,7 @@ tags:
   - meta
   - index
 status: developing
-page_count: 28
+page_count: 29
 related: []
 sources: []
 ---
@@ -122,9 +122,10 @@ Side-by-side analyses (e.g., OOR vs TypeORM vs Drizzle).
 
 ## Questions — `wiki/questions/`
 
-Filed answers to user queries.
+Filed answers to queries, plus **open questions** kept visible until resolved.
 
-- _none yet — see [[questions/_index]]_
+- 🔓 [[decorator-order-independence]] — *open* — could `@Column` / `@Nullable` work regardless of decoration order?
+- See [[questions/_index]] for the rolling index.
 
 ## Meta — `wiki/meta/`
 

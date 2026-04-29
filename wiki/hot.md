@@ -42,6 +42,10 @@ sources: []
 - **`@Nullable` write path** (resolved 2026-04-29): three symbols, not two. `architecture-overview.md` was right; `decorator-metadata-storage.md` had elided `NULLABLE_KEY` because its scope was "what flows into storage" — and `NULLABLE_KEY` doesn't reach storage. Code spot-check against `src/decorators/nullable/nullable.ts` and `src/decorators/column/column.ts` confirmed the third bucket exists, holds a `Map<string, boolean>`, and is enforced by `@Column` via `MissingNullabilityDecoratorError`. Decorator-order constraint surfaced as a new fact: `@Nullable` must be inner. Wiki pages corrected: [[ECMAScript Stage-3 Decorators]], [[MetadataStorage]], [[entity-registration]], [[sources/decorator-metadata-storage]].
 - **Test layout** (resolved 2026-04-29): unit tests colocated under `src/`; integration tests under top-level `tests/`. See [[0006-tdd-rhythm]] § Clarification.
 
+## Open Questions
+
+- 🔓 [[decorator-order-independence]] — could `@Column` / `@Nullable` be made order-independent? Filed 2026-04-29 with three sketched approaches (defer-to-`@Entity` is cleanest). No decision yet.
+
 ## Active Threads
 
 - **Next ingest candidate:** `.raw/query-builder-design.md` — expected to deepen [[Lazy Query Builder]] and [[Conditions Proxy]], possibly produce `concepts/Type Narrowing.md` and refine [[query-lifecycle]] step 3 / 5 details.

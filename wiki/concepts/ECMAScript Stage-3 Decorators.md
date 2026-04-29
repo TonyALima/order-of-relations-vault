@@ -70,6 +70,8 @@ The `context.metadata` bag is **fresh per class** — Stage-3 does not propagate
 > ```
 >
 > `@PrimaryColumn` is exempt: it forces `nullable: false` and skips the `NULLABLE_KEY` lookup entirely.
+>
+> **Open question:** [[decorator-order-independence]] — whether to redesign so both orderings work.
 
 > [!note] History of refinements (2026-04-29)
 > This page absorbed three corrections in one day:
