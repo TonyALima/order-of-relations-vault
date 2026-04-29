@@ -53,7 +53,7 @@ A choice has to be made before any decorator is written, because the two dialect
 
 ### Neutral
 
-- Forces a custom `MetadataStorage` abstraction (see [[Decorator Metadata Storage]] when ingested). This is also a benefit for testability, but it is mostly *different*, not *better* than the legacy approach.
+- Forces a custom `MetadataStorage` abstraction (see [[sources/decorator-metadata-storage|Decorator Metadata Storage]] for the pin-down). This is also a benefit for testability, but it is mostly *different*, not *better* than the legacy approach.
 
 ## Alternatives Considered
 

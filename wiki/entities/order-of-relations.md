@@ -3,7 +3,7 @@ type: entity
 title: "order-of-relations"
 entity_type: repository
 role: "The OOR codebase — TypeScript ORM library this vault documents"
-first_mentioned: "[[CLAUDE]]"
+first_mentioned: "[[overview]]"
 created: 2026-04-29
 updated: 2026-04-29
 tags:
