@@ -45,13 +45,30 @@ vault/
 ## Conventions
 
 - All notes use YAML frontmatter: `type`, `title`, `created`, `updated`, `tags`, `status` (minimum). See `_templates/` for the canonical shape.
-- Wikilinks use `[[Note Name]]` — filenames are unique across the vault, so no paths needed.
+- Wikilinks use `[[Note Name]]` — filenames are unique across the vault, so the bare basename usually works. For sources and other path-prefixed targets, the path-form `[[sources/welcome]]` (with optional alias `[[sources/welcome|Welcome]]`) is also valid and renders cleaner.
 - `.raw/` contains source documents and is **never modified**. To correct or extend a source, file a new note in `wiki/` that links back to it.
 - `wiki/index.md` is the master catalog: update on every ingest.
-- `wiki/log.md` is **append-only**: never edit past entries; new entries go at the **top**.
+- `wiki/log.md` is **append-only**: never edit past entries; new entries go at the **top**. *Dead wikilinks inside past log entries are preserved as audit trail and are not lint issues.*
 - `wiki/hot.md` is overwritten end-to-end after every significant operation. Keep under 500 words.
-- ADRs live in `wiki/decisions/` with the naming convention `NNNN-short-title.md` (zero-padded sequence).
 - Obsidian's `workspace.json` is gitignored — every other `.obsidian/` file is committed.
+
+### Filename naming (per category)
+
+The vault uses **category-specific** filename conventions, consistent within each folder. Wikilinks must match filenames exactly, so the convention you pick for a new file determines how it gets linked.
+
+| Folder | Convention | Examples | Why |
+|---|---|---|---|
+| `wiki/concepts/` | **Title Case with spaces** | `Lazy Query Builder.md`, `Repository Pattern.md` | Concepts read as natural-language ideas; the page title and the wikilink form match. Exception: code identifiers keep their literal form (`sqlJoin.md`). |
+| `wiki/components/` | **PascalCase**, matching the exported class | `Repository.md`, `QueryBuilder.md`, `MetadataStorage.md`, `Database.md` | Component pages document a concrete TypeScript class; the filename matches the symbol name to make grep/lookup symmetric. |
+| `wiki/decisions/` | `NNNN-short-title.md` (zero-padded sequence) | `0001-stage-3-decorators.md`, `0007-bun-toolchain.md` | Standard ADR convention. Sortable in any file listing; references like "ADR 0003" map directly to the filename. |
+| `wiki/sources/` | **lowercase-kebab**, mirroring the `.raw/` filename | `welcome.md`, `architecture-overview.md` | The `.raw/.manifest.json` keys path-to-path; symmetric naming makes the manifest readable and the synthesis-to-source mapping obvious. |
+| `wiki/flows/` | **lowercase-kebab** | `query-lifecycle.md`, `entity-registration.md`, `lifecycle-of-a-create.md` | Flows are named after the behavior they describe ("the lifecycle of X"); kebab is conventional for action-shaped slugs. |
+| `wiki/questions/` | **lowercase-kebab** | `decorator-order-independence.md`, `get-one-limit-1.md` | Questions are slugs of the question itself; kebab keeps URLs / cross-tool references portable. |
+| `wiki/entities/` | **Proper-noun shape** for orgs/products (`Bun.md`, `PostgreSQL.md`); **kebab** for code-shaped entities (`order-of-relations.md`) | — | Match how the entity is referred to in the world. Repos use their actual GitHub slug; products use their canonical capitalization. |
+| `_index.md` (any folder) | Literal `_index.md` | — | Convention for folder hub pages; sorts to the top of directory listings. |
+| `wiki/index.md`, `log.md`, `hot.md`, `overview.md`, `getting-started.md` | Literal lowercase | — | Top-level meta hubs. |
+
+When in doubt: look at neighboring files in the same folder and match the local convention. Mixing within a folder is the actual style violation; using a different convention across folders is intentional.
 
 ## Operations
 

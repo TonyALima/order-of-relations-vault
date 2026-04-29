@@ -20,9 +20,10 @@ First lint pass after the bulk-ingest of all five `.raw/` sources.
 - **False positives identified:** 9 "dead links" that are actually inside backticks (documentation prose), 40+ "empty sections" that are normal heading hierarchy
 - **Auto-fixed (2026-04-29):** 2 — `[[Decorator Metadata Storage]]` rename in `0001-stage-3-decorators.md`, and `first_mentioned` in `order-of-relations.md`
 - **Resolved by stub creation (2026-04-29):** 2 — both `[[Schema Migrations]]` occurrences now resolve to a new seed concept page
-- **Preserved by policy:** 1 — the `[[CLAUDE]]` reference in `log.md:148` is in an append-only log entry; per vault policy, log entries are never edited
+- **Documentation updated (2026-04-29):** vault `CLAUDE.md` now documents per-category filename conventions and the append-only-log policy
+- **Preserved by policy:** 1 — the `[[CLAUDE]]` reference in `log.md:148` is in an append-only log entry; per vault policy, log entries are never edited (now formalized in `CLAUDE.md`)
 - **Pending owner decision:** 0
-- **Pending — documentation:** 1 — naming-convention split should be documented in vault `CLAUDE.md`
+- **Pending — documentation:** 0
 - **Naming-convention drift:** 0 within each category; CLAUDE.md doesn't document the per-category convention split — informational
 
 ## Wiki health overall: ✅ green
@@ -81,9 +82,13 @@ The vault uses **category-specific** naming, consistent within each category but
 | `entities/` | Title Case for proper nouns; repo-name kebab for codebases | `Bun.md`, `PostgreSQL.md`, `order-of-relations.md` (matches the GitHub repo name). |
 | `components/` | PascalCase matching the exported class name | `Repository.md`, `QueryBuilder.md`, `MetadataStorage.md`, `Database.md`. |
 
-**Issue:** `CLAUDE.md` claims wiki convention is "Title Case with spaces" but practice is per-category. **Suggest** updating `CLAUDE.md` § Conventions to document the actual split, so future contributors don't break either pattern.
+**Issue:** `CLAUDE.md` previously claimed wiki convention is "Title Case with spaces" but practice is per-category.
 
-**Auto-fix safety:** Needs review — this is documentation, not data; the user should decide the framing.
+**Resolution (2026-04-29):** ✅ **DONE.** Updated vault `CLAUDE.md` § Conventions:
+- The bullet on wikilinks now mentions both bare-basename and path-prefix forms (`[[sources/welcome]]` / `[[sources/welcome|Welcome]]`).
+- The "Wikilinks use `[[Note Name]]`" wording was kept but clarified.
+- A new sub-section **"Filename naming (per category)"** documents the seven-row table of folder-specific conventions (concepts → Title Case, components → PascalCase, decisions → ADR-numbered, sources/flows/questions → kebab, entities → mixed by entity nature, `_index` literal, top-level meta hubs literal).
+- A footnote was added to the `log.md` rule explicitly stating *"Dead wikilinks inside past log entries are preserved as audit trail and are not lint issues"* — formalizing the policy that handled the `[[CLAUDE]]` case in this lint pass.
 
 ## Stale Claims
 
@@ -118,7 +123,7 @@ Status as of 2026-04-29:
 1. ✅ **Done** — renamed `[[Decorator Metadata Storage]]` → `[[sources/decorator-metadata-storage|Decorator Metadata Storage]]` in `0001-stage-3-decorators.md:56`.
 2. ✅ **Done** — `first_mentioned` in `order-of-relations.md` retargeted to `[[overview]]`.
 3. ✅ **Done** — created [[Schema Migrations]] seed concept page (option 1, stub). Both dead-link occurrences in `Database.md` and `schema-create-drop.md` now resolve.
-4. ⏸️ **Pending** — document naming-convention split in vault `CLAUDE.md`'s "Conventions" section.
+4. ✅ **Done** — vault `CLAUDE.md` § Conventions updated with the per-category naming table and the append-only log policy footnote.
 5. ⏸️ **Skipped by policy** — `[[CLAUDE]]` in `log.md:148`: append-only log entry, not editable. Future lint runs should classify `log.md` as a read-only zone.
 
 ## What was checked but reported zero issues
