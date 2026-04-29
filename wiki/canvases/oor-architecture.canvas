@@ -35,7 +35,7 @@
 		{"id":"rt-postgres-1777490940","type":"file","file":"wiki/entities/PostgreSQL.md","x":60,"y":480,"width":300,"height":100},
 		{"id":"rt-typescript-1777490941","type":"file","file":"wiki/entities/TypeScript.md","x":400,"y":480,"width":300,"height":100},
 		{"id":"rt-oor-1777490942","type":"file","file":"wiki/entities/order-of-relations.md","x":-280,"y":600,"width":300,"height":100},
-		{"id":"title","type":"text","text":"<div style=\"text-align:center; font-size:128px; font-weight:700; line-height:1.1; margin-top:12px;\">OOR Architecture</div>\n<div style=\"text-align:center; font-size:32px; margin-top:24px; opacity:0.85;\"><b>Foundations → Components → Concepts</b> (top row) &nbsp;·&nbsp; <b>Flows → Runtime → Open Questions</b> (bottom row)</div>\n<div style=\"text-align:center; font-size:24px; margin-top:14px; opacity:0.7; font-style:italic;\">Visual map of the codebase. Click any card to open the underlying wiki page.</div>","x":-580,"y":-760,"width":1580,"height":360,"color":"6"}
+		{"id":"bg-oor-1777490950","type":"file","file":"wiki/canvases/assets/OOR.png","x":-480,"y":-1080,"width":1279,"height":720}
 	],
 	"edges":[
 		{"id":"edge-found-comp","fromNode":"zone-foundations","fromSide":"right","toNode":"zone-components","toSide":"left","label":"constrains"},
