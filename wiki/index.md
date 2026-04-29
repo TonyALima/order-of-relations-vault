@@ -7,6 +7,7 @@ tags:
   - meta
   - index
 status: developing
+page_count: 16
 related: []
 sources: []
 ---
@@ -45,7 +46,14 @@ Reusable building blocks (decorators, query-builder fragments, container primiti
 
 Architecture Decision Records. Append-only, dated.
 
-- _none yet — see [[decisions/_index]]_
+- [[0001-stage-3-decorators]] — Stage-3 decorators; no `reflect-metadata`.
+- [[0002-repository-with-lazy-query-builder]] — `Repository<T>` entry point + lazy `QueryBuilder<T>`.
+- [[0003-singleton-di-container]] — minimal singleton DI container.
+- [[0004-parameterized-sql-only]] — `sql.unsafe` banned codebase-wide.
+- [[0005-no-any-type-driven-api]] — strict no-`any`; type-driven public API.
+- [[0006-tdd-rhythm]] — red-green-refactor with `bun test`, colocated tests.
+- [[0007-bun-toolchain]] — Bun is the single toolchain.
+- See [[decisions/_index]] for the rolling index.
 
 ## Dependencies — `wiki/dependencies/`
 
@@ -65,19 +73,28 @@ Data flows and request paths (e.g., lifecycle of a `findMany` call).
 
 One synthesis page per item in `.raw/`.
 
-- _pending ingest of legacy notes from `.raw/` — see [[sources/_index]]_
+- [[sources/welcome|Welcome to the OOR Vault]] — manifesto: pillars + 7 ADR seeds (2026-04-29).
+- _pending ingest: `architecture-overview.md`, `decorator-metadata-storage.md`, `query-builder-design.md`, `repository-contract.md` — see [[sources/_index]]._
 
 ## Entities — `wiki/entities/`
 
 People, organizations, products, repos, libraries that show up in the work.
 
-- _none yet — see [[entities/_index]]_
+- [[Bun]] — runtime + package manager + test runner + bundler; the single toolchain.
+- [[PostgreSQL]] — sole target database.
+- [[TypeScript]] — host language; strict no-`any`.
+- See [[entities/_index]] for the rolling index.
 
 ## Concepts — `wiki/concepts/`
 
 Ideas, patterns, frameworks (e.g., Stage-3 decorators, repository pattern, lazy query builder).
 
-- _none yet — see [[concepts/_index]]_
+- [[ECMAScript Stage-3 Decorators]] — the standardized decorator dialect.
+- [[Repository Pattern]] — `Repository<T>` as persistence entry point.
+- [[Lazy Query Builder]] — clauses accumulate; SQL runs only on terminal calls.
+- [[Parameterized SQL]] — placeholders + bound parameters; the only allowed query form.
+- [[Dependency Injection Container]] — minimal singleton container.
+- See [[concepts/_index]] for the rolling index.
 
 ## Domains — `wiki/domains/`
 

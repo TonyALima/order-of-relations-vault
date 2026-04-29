@@ -1,0 +1,35 @@
+{
+  "sources": {
+    ".raw/welcome.md": {
+      "hash": "6c43e80854db106e0c8ac31648c25c77",
+      "ingested_at": "2026-04-29",
+      "pages_created": [
+        "wiki/sources/welcome.md",
+        "wiki/decisions/0001-stage-3-decorators.md",
+        "wiki/decisions/0002-repository-with-lazy-query-builder.md",
+        "wiki/decisions/0003-singleton-di-container.md",
+        "wiki/decisions/0004-parameterized-sql-only.md",
+        "wiki/decisions/0005-no-any-type-driven-api.md",
+        "wiki/decisions/0006-tdd-rhythm.md",
+        "wiki/decisions/0007-bun-toolchain.md",
+        "wiki/concepts/ECMAScript Stage-3 Decorators.md",
+        "wiki/concepts/Repository Pattern.md",
+        "wiki/concepts/Lazy Query Builder.md",
+        "wiki/concepts/Parameterized SQL.md",
+        "wiki/concepts/Dependency Injection Container.md",
+        "wiki/entities/Bun.md",
+        "wiki/entities/PostgreSQL.md",
+        "wiki/entities/TypeScript.md"
+      ],
+      "pages_updated": [
+        "wiki/index.md",
+        "wiki/hot.md",
+        "wiki/log.md",
+        "wiki/sources/_index.md",
+        "wiki/concepts/_index.md",
+        "wiki/entities/_index.md",
+        "wiki/decisions/_index.md"
+      ]
+    }
+  }
+}
