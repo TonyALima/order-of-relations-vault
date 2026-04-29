@@ -17,6 +17,36 @@ Append-only record of every wiki operation. Newest entries on top. Never edit pa
 
 ---
 
+## 2026-04-29 — file | New open question: support user-defined indexes
+
+**Filed:** [[support-user-indexes]] — add `@Index` / `@Unique` decorators so users can declare indexes on columns and column-tuples; `schema-create` should emit `CREATE INDEX` alongside `CREATE TABLE`.
+
+**Grounded in current state** (verified 2026-04-29 against `../order-of-relations`):
+
+- `src/decorators/` contains only `column/`, `entity/`, `nullable/`, `relation/` — no `@Index` or `@Unique` decorator exists.
+- The only index OOR emits today is the implicit `idx_discriminator` for STI roots (per [[sources/drift-d5-discriminator-index]]).
+- The schema-emission pattern is already proven; only the metadata source is missing.
+
+**Initial triage:** `impact: medium`, `effort: M`, `score: 6`. Sits between [[decorator-order-independence]] (7) and the two `low / S` query-builder deferrals (5).
+
+**Why medium not high:** workarounds exist (out-of-band `.sql` migrations); will climb to high once OOR has real users running non-trivial table sizes.
+
+**Why M not S:** new decorator(s), new metadata key, schema-create wiring, naming policy, decisions across three independent design axes (decorator location, `@Unique` shape, naming).
+
+**Cross-links recorded:**
+
+- Constrains [[decorator-order-independence]] — confirms `@Index` is a real (not hypothetical) future sibling decorator. Reinforces the case for Option A.
+- Folds in the unfiled `idx_discriminator` collision question from [[hot]] — a naming policy applies uniformly to discriminator and user indexes.
+
+**Files touched:**
+
+- `wiki/questions/support-user-indexes.md` — new question page.
+- `wiki/questions/_index.md` — added to the impact/effort table.
+- `wiki/index.md` — Questions section updated.
+- `wiki/hot.md` — Open Questions section updated; `idx_discriminator` note re-pointed at this question.
+
+---
+
 ## 2026-04-29 — refactor | Turn `wiki/questions/` into an issue tracker
 
 **Decision:** keep open questions in `wiki/questions/` (no new `issues/` folder) and extend each page with `impact` + `effort` + `decided_by` frontmatter. Add a Bases view at `wiki/meta/issues.base` for sorting and filtering.

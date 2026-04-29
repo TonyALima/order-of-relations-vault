@@ -154,6 +154,7 @@ Side-by-side analyses (e.g., OOR vs TypeORM vs Drizzle).
 Filed answers to queries, plus **open questions** kept visible until resolved. Open questions carry `impact` + `effort` frontmatter and surface in the [[issues|Issue tracker]] Base.
 
 - 🔓 [[decorator-order-independence]] — *open · medium / S* — could `@Column` / `@Nullable` work regardless of decoration order?
+- 🔓 [[support-user-indexes]] — *open · medium / M* — add `@Index` / `@Unique` so users can declare indexes?
 - 🔓 [[get-one-limit-1]] — *open · low / S* — `getOne()` slicing vs. `LIMIT 1`?
 - 🔓 [[apply-options-accumulation]] — *open · low / S* — `applyOptions()` replace vs. accumulate?
 - See [[questions/_index]] for the rolling index.

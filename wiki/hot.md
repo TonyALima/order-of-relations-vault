@@ -39,9 +39,10 @@ sources: []
 ## Open Questions (now tracked as issues — see [[issues|Issue tracker]])
 
 - 🔓 [[decorator-order-independence]] — *medium / S, score 7* — could `@Column` / `@Nullable` work regardless of decoration order?
+- 🔓 [[support-user-indexes]] — *medium / M, score 6* — add `@Index` / `@Unique`; emit `CREATE INDEX` from schema-create. Folds in the `idx_discriminator` naming fix.
 - 🔓 [[get-one-limit-1]] — *low / S, score 5* — `getOne()` slicing vs `LIMIT 1`?
 - 🔓 [[apply-options-accumulation]] — *low / S, score 5* — `applyOptions()` replace vs accumulate?
-- 🔓 (potential, from D5, not yet filed) `idx_discriminator` collision — namespace per-table (`idx_<root>_discriminator`)?
+- 🔓 (still unfiled — folded into [[support-user-indexes]] naming policy) `idx_discriminator` collision.
 
 ## Active Threads
 

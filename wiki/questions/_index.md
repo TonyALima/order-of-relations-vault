@@ -38,6 +38,7 @@ The live, sortable view is at [[issues|Issue tracker]] (`wiki/meta/issues.base`)
 | Question | Impact | Effort |
 |---|---|---|
 | [[decorator-order-independence]] — `@Column` / `@Nullable` order independence | medium | S |
+| [[support-user-indexes]] — add `@Index` / `@Unique`; emit `CREATE INDEX` from schema-create | medium | M |
 | [[get-one-limit-1]] — `getOne()` `LIMIT 1` vs slice | low | S |
 | [[apply-options-accumulation]] — `applyOptions()` replace vs accumulate | low | S |
 
