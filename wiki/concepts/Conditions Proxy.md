@@ -7,7 +7,7 @@ aliases:
   - "where callback proxy"
   - "FieldConditionBuilder proxy"
 created: 2026-04-29
-updated: 2026-04-29
+updated: 2026-04-30
 tags:
   - concept
   - query-builder
@@ -15,10 +15,13 @@ tags:
 status: seed
 related:
   - "[[Lazy Query Builder]]"
+  - "[[PrimaryKey Brand]]"
   - "[[query-lifecycle]]"
   - "[[sources/architecture-overview]]"
+  - "[[sources/pk-aware-repository-methods]]"
 sources:
   - "../.raw/architecture-overview.md"
+  - "../.raw/pk-aware-repository-methods.md"
 ---
 
 # Conditions Proxy
@@ -37,11 +40,11 @@ And the proxy type:
 
 ```ts
 export type Conditions<T> = {
-  [K in keyof T]?: FieldConditionBuilder<T[K]>;
+  [K in keyof T]?: FieldConditionBuilder<Unbrand<T[K]>>;
 };
 ```
 
-A `Partial` mapped type over the entity's keys. Each key maps to a per-field builder parameterized by the *field's* type — `u.age.gt(18)` accepts `number`, `u.name.eq('Alice')` accepts `string`, and a typo on the property name is a compile error.
+A `Partial` mapped type over the entity's keys. Each key maps to a per-field builder parameterized by the *field's unbranded* type — `u.age.gt(18)` accepts `number`, `u.name.eq('Alice')` accepts `string`, `u.id?.eq(1)` accepts a plain `number` even though `T['id']` is `PrimaryKey<number>`, and a typo on the property name is a compile error. The brand is erased at runtime, so SQL comparison doesn't care; at the type level, callers write predicates without ceremony. See [[PrimaryKey Brand]] for `Unbrand<V>`.
 
 ```ts
 userRepo.findMany({
@@ -107,10 +110,14 @@ userRepo.findMany({
 > [!note] Refined 2026-04-29 (drift D4)
 > An earlier version of this page listed `.neq` (the actual method is `ne`) and `.before` / `.after` / `.matches` (none exist) as if they were per-column-type narrowed operators. The real surface is the nine uniform methods documented above; the `.raw/query-builder-design.md` source had it right and the synthesis introduced the drift. See [[sources/drift-d4-conditions-proxy-operators]].
 
+> [!note] Refined 2026-04-30 — `Unbrand<T[K]>` per field
+> When the [[PrimaryKey Brand|`PrimaryKey<V>` brand]] shipped, `Conditions<T>` switched from `FieldConditionBuilder<T[K]>` to `FieldConditionBuilder<Unbrand<T[K]>>`. Without the change, `c.id?.eq(1)` would reject the plain literal `1` and demand a `PrimaryKey<number>`. The fix lets the `findById` body avoid an internal cast — it passes the unbranded `key[prop]` straight into `eq` without an `as T[keyof T]` workaround. See [[sources/pk-aware-repository-methods]] § Sub-decisions.
+
 ## Connections
 
 - [[Lazy Query Builder]] — owns the proxy and consumes the returned `(Condition | undefined)[]`.
 - [[QueryBuilder]] — the concrete class that builds and validates the proxy at runtime.
+- [[PrimaryKey Brand]] — supplies the `Unbrand<V>` mapped helper that lets `c.id?.eq(1)` accept a plain literal.
 - [[query-lifecycle]] — step 3 builds the proxy, step 4 validates the returned array (rejects `undefined` with the offending index).
 - [[Parameterized SQL]] — the safety property the proxy preserves.
 - [[0005-no-any-type-driven-api]] — the strictness ADR this construction depends on.
@@ -122,3 +129,4 @@ userRepo.findMany({
 ## Sources
 
 - `.raw/architecture-overview.md` §§ "Lifecycle of a Query" (steps 3–4)
+- `.raw/pk-aware-repository-methods.md` § "Conditions<T> consumes Unbrand<T[K]>, not T[K]"

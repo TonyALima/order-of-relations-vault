@@ -8,7 +8,7 @@ aliases:
   - "Standard decorators"
   - "TC39 decorators"
 created: 2026-04-29
-updated: 2026-04-29
+updated: 2026-04-30
 tags:
   - concept
   - decorators
@@ -16,9 +16,12 @@ tags:
 status: seed
 related:
   - "[[0001-stage-3-decorators]]"
+  - "[[PrimaryKey Brand]]"
   - "[[sources/welcome]]"
+  - "[[sources/pk-aware-repository-methods]]"
 sources:
   - "../.raw/welcome.md"
+  - "../.raw/pk-aware-repository-methods.md"
 ---
 
 # ECMAScript Stage-3 Decorators
@@ -79,6 +82,19 @@ The `context.metadata` bag is **fresh per class** — Stage-3 does not propagate
 > 2. The symbol-key list was first claimed to be three, then "corrected" to two (per `.raw/decorator-metadata-storage.md`'s narrower framing), then **re-corrected back to three** after a code spot-check (`src/decorators/nullable/nullable.ts` and `src/decorators/column/column.ts` in [[order-of-relations]]) confirmed the third bucket exists. The decorator-metadata-storage source had elided `NULLABLE_KEY` because it focuses on what flows into the storage `Map`; `NULLABLE_KEY` is consumed by `@Column` and never reaches storage. See [[sources/decorator-metadata-storage]] § "Resolved disagreement" for the trail.
 > 3. The order constraint above was added on the same code spot-check.
 
+## The constraint-flip pattern (read-only)
+
+Stage-3 decorators **cannot inject type information** into a field — they can only READ the field's declared type via the `ClassFieldDecoratorContext<This, Value>` constraint. OOR exploits this by *narrowing* `Value` in decorator overloads to reject incompatible declarations at the call site:
+
+- `@Nullable` requires `NullableField<V>` → field must be declared with the `?` modifier.
+- `@NotNullable` requires `NotNullableField<V>` → field must be declared with the `!` modifier.
+- `@PrimaryColumn` (with autogeneration) requires `NullableField<V> & NullablePrimaryKey<V>` → field must be optional **and** carry the [[PrimaryKey Brand|`PrimaryKey<V>` brand]].
+- `@PrimaryColumn` (without autogeneration) requires `NotNullableField<V> & PrimaryKey<V>` → field must be required **and** branded.
+
+This is the only structural mechanism for compile-time enforcement available in the dialect. It is why the brand has to live at the declaration site (a decorator cannot add it for you), and it is why the modifier (`?` vs `!`) on the field has to match the autogeneration option on `@PrimaryColumn` — both checks happen at the same decorator call.
+
+See [[PrimaryKey Brand]] § "How decorators enforce the brand" for the resolution table across all six declaration shapes.
+
 ## Why It Matters
 
 For OOR specifically:
@@ -120,7 +136,9 @@ function Entity(target: Function) {
 - [[Relation Target Thunk]] — the closure pattern that breaks circular-reference TDZ at decoration time.
 - [[Database]] — the owner of `MetadataStorage`; takes `@Entity(db)` as its registration argument.
 - [[TypeScript]] — host language; Stage-3 decorators require TS 5.0+.
+- [[PrimaryKey Brand]] — the second use of the constraint-flip pattern (after nullability); enforces the brand at the `@PrimaryColumn` declaration site.
 
 ## Sources
 
 - `.raw/welcome.md` § "Stage-3 decorators, no `reflect-metadata`"
+- `.raw/pk-aware-repository-methods.md` § "@PrimaryColumn decorator constraint update"

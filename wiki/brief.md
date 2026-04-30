@@ -46,7 +46,9 @@ Downward dependencies only. Decorators are the only writers of metadata.
 
 ## Method-shape facts worth knowing up front
 
-- `create(entity: T)` — signature is `T`, not `Partial<T>`. Returns `Partial<T>` with **only PK fields** (not a hydrated entity).
+- `create(entity: UnbrandedT<T>)` — signature is `T` (modulo brand-stripping on input), not `Partial<T>`. Returns `PKOutput<T>` with **only PK fields** (branded via `PrimaryKey<V>`; not a hydrated entity).
+- `findById(key: PKInput<T>)` / `delete(key: PKInput<T>)` — strict PK shape, every key required, all unbranded. `findById({})` and `findById({ name: 'x' })` are compile errors. → [[PrimaryKey Brand]]
+- `update(entity: UnbrandedT<T> & PKInput<T>)` — full entity, plus PK keys required regardless of `T`'s optional modifier. Closes the silent-`update({ name: 'x' })` bug on autogen entities. → [[0008-pk-aware-compile-time]]
 - Autogeneration is **explicit-only**: two strategies (`clientSide` / `dbSide`); a caller-supplied value always wins. → [[Autogeneration]]
 - `where` callback shape: `(conditions: Conditions<T>) => (Condition | undefined)[]`. Missing-column entries throw `UndefinedWhereConditionError` carrying the offending **index**.
 - `FindOptions<T>` also accepts `inheritance: InheritanceSearchType` (`ALL` / `ONLY` / `SUBCLASSES`) — opts a read into / out of subclass-scoped discriminator filtering. See [[Single-Table Inheritance]] § Reading Across the Hierarchy.

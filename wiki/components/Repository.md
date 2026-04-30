@@ -5,7 +5,7 @@ component_kind: class
 module: "src/core/repository/"
 exports_as: "Repository"
 created: 2026-04-29
-updated: 2026-04-29
+updated: 2026-04-30
 tags:
   - component
   - repository
@@ -15,12 +15,15 @@ related:
   - "[[Repository Pattern]]"
   - "[[QueryBuilder]]"
   - "[[Autogeneration]]"
+  - "[[PrimaryKey Brand]]"
   - "[[lifecycle-of-a-create]]"
   - "[[query-lifecycle]]"
   - "[[sources/repository-contract]]"
+  - "[[sources/pk-aware-repository-methods]]"
 sources:
   - "../.raw/repository-contract.md"
   - "../.raw/architecture-overview.md"
+  - "../.raw/pk-aware-repository-methods.md"
 ---
 
 # Repository
@@ -33,21 +36,31 @@ Headline rule: **narrow surface, deep contract.** Every method that operates on 
 
 ## Operations
 
-`Repository<T>` exposes exactly **six** public methods:
+`Repository<T>` exposes exactly **six** public methods. Four of them — `findById`, `delete`, `update`, `create` — derive their input/output PK shapes from the [[PrimaryKey Brand|`PrimaryKey<V>` brand]] on the entity's `@PrimaryColumn` fields.
 
-| Method | Returns | Owns |
+| Method | Signature | Owns |
 |---|---|---|
-| `create(entity: T)` | `Promise<Partial<T>>` (PK fields only) | Insert one row, return the primary key. |
-| `findById(key)` | `Promise<T \| null>` | Locate a row by its full primary key. |
-| `findOne(options?)` | `Promise<T \| null>` | Build a `QueryBuilder<T>`, apply options, run `getOne()`. |
-| `findMany(options?)` | `Promise<T[]>` | Same shape as `findOne`, run `getMany()`. |
-| `update(entity: T)` | `Promise<void>` | Overwrite a row identified by its primary key. |
-| `delete(key)` | `Promise<void>` | Remove a row by its primary key. |
+| `create` | `(entity: UnbrandedT<T>) => Promise<PKOutput<T>>` | Insert one row, return the primary key (branded). |
+| `findById` | `(key: PKInput<T>) => Promise<T \| null>` | Locate a row by its full primary key. |
+| `findOne` | `(options?: FindOptions<T>) => Promise<T \| null>` | Build a `QueryBuilder<T>`, apply options, run `getOne()`. |
+| `findMany` | `(options?: FindOptions<T>) => Promise<T[]>` | Same shape as `findOne`, run `getMany()`. |
+| `update` | `(entity: UnbrandedT<T> & PKInput<T>) => Promise<void>` | Overwrite a row identified by its primary key. |
+| `delete` | `(key: PKInput<T>) => Promise<void>` | Remove a row by its primary key. |
 
 `findOne` / `findMany` are the **composition entry points** — they accept `FindOptions<T>` and execute one SQL statement. `findById` is the by-key reader. `create`, `update`, `delete` are the write surface.
 
+`PKInput<T>` is the strict input PK shape (every PK key, all required, all non-undefined, **unbranded** — callers pass `{ id: 1 }`, no cast needed). `PKOutput<T>` is the same shape **branded**. `UnbrandedT<T>` is `T` with every field unbranded. See [[PrimaryKey Brand]] § "Helper types" for the derivations.
+
 > [!note] Drift correction 2026-04-29
 > An earlier version of this table listed `find(): QueryBuilder<T>` as a "handoff" method. **There is no `find()`.** The builder is constructed inside `findMany` / `findOne`, used once, and discarded. Direct construction (`new QueryBuilder<T>(EntityClass, db)`) is possible but is a library-internal hatch, not a documented user API. See [[sources/drift-d1-repository-find]].
+
+> [!note] Refinement 2026-04-30 — PK-aware compile-time enforcement
+> Four signatures changed when the `PrimaryKey<V>` brand shipped:
+> - `findById`/`delete` previously accepted `Partial<T>` (any subset). Now they require `PKInput<T>` — `findById({})` and `findById({ name: 'x' })` are compile errors.
+> - `update(entity: T)` previously typechecked `update({ name: 'x' })` on autogen entities (because autogen PKs are declared `id?: PrimaryKey<number>` — optional in `T`) and built `WHERE id = NULL` silently. Now `update`'s input is `UnbrandedT<T> & PKInput<T>` — PK fields are required and non-undefined regardless of `T`'s optional modifier.
+> - `create()`'s return type went from `Partial<T>` to `PKOutput<T>` (PK fields only, **branded**). Read-side outputs (`findById`/`findOne`/`findMany` returning `T`) are likewise branded; the round-trip `repo.update(await repo.findById({ id }))` works without casts.
+>
+> See [[sources/pk-aware-repository-methods]] and [[0008-pk-aware-compile-time]].
 
 ## The `requirePrimaryKey` gate
 
@@ -59,6 +72,8 @@ Every method that needs a primary key — `create`, `findById`, `update`, `delet
 For composite primary keys, the rule applies **per column**.
 
 This single gate is why the runtime story is symmetric across the four PK-using methods. There isn't a per-method "is this complete?" check; there is one rule, applied four times.
+
+After the [[PrimaryKey Brand]] work, the gate is the **floor** for cast-bypassed callers (`update(data as User)`) — the type system catches the headline cases. The gate's parameter type widened from `Partial<T>` to `PKInput<T> | UnbrandedT<T>`, since the new strict shapes aren't assignable to `Partial<T>` (the brand asymmetry blocks the widening).
 
 ## `create()` — the contract in detail
 
@@ -90,7 +105,9 @@ What `create()` does **not** check at compile time: relations and FK shape. Thos
 
 ### Runtime
 
-`create()` returns `Promise<Partial<T>>` — the returned object contains exactly the **primary-key fields**, populated from the SQL `RETURNING` clause. It does **not** hand back a hydrated entity.
+`create()` returns `Promise<PKOutput<T>>` — the returned object contains exactly the **primary-key fields** (branded), populated from the SQL `RETURNING` clause. It does **not** hand back a hydrated entity.
+
+The destructured `id` is `PrimaryKey<number>`, which is assignable to `number` anywhere a plain number is expected, so `const { id } = await repo.create(...); await repo.findById({ id })` works without ceremony — and the `id!` non-null assertion seen in older code is now redundant (`PKOutput<T>` makes PK fields non-undefined).
 
 > [!key-insight] Why `create()` doesn't return the full row
 > *"`create()`'s job is to commit a row and tell you how to find it again, not to re-read it."* If you want the full row, follow with `findById()`. This is more honest than ORMs that auto-rehydrate — the caller decides whether the round-trip is worth it.
@@ -117,9 +134,9 @@ If you need direct access to a `QueryBuilder<T>` (e.g. to share state across hel
 
 | Where | Error | Notes |
 |---|---|---|
-| `findById(key)`, `delete(key)` | `IncompletePrimaryKeyError` | Any PK property absent from `key`. |
-| `create(entity)` | `IncompletePrimaryKeyError` | Non-autogenerated PK property absent. (Type system catches this first; the runtime gate catches bypassed-type-check callers.) |
-| `update(entity)` | `IncompletePrimaryKeyError` | Indirectly, via `requirePrimaryKey`. |
+| `findById(key)`, `delete(key)` | `IncompletePrimaryKeyError` | Any PK property absent from `key`. (Type system catches this first via `PKInput<T>`; the runtime gate catches cast-bypassed callers.) |
+| `create(entity)` | `IncompletePrimaryKeyError` | Non-autogenerated PK property absent. (Type system catches this first via `UnbrandedT<T>`'s required-modifier preservation; the runtime gate catches bypassed-type-check callers.) |
+| `update(entity)` | `IncompletePrimaryKeyError` | Indirectly, via `requirePrimaryKey`. (Type system catches missing PK first via `UnbrandedT<T> & PKInput<T>`.) |
 | Anything else | *(propagates from driver)* | Connection failures, constraint violations, type mismatches — these come from `pg` / Bun SQL unwrapped. The repository is intentionally thin around them; wrapping would obscure the driver's diagnostic. |
 
 The error carries `entityName` and `missingProperties: string[]`, both populated and asserted by tests.
@@ -140,14 +157,17 @@ The closing line from the source is worth keeping: *"These are not gaps; they ar
 - [[Repository Pattern]] — the concept this class realizes.
 - [[QueryBuilder]] — constructed inside `findOne` / `findMany`; used once, then discarded.
 - [[Autogeneration]] — the strategy concept this class executes against.
+- [[PrimaryKey Brand]] — the type-level marker the four PK-using signatures consume.
 - [[lifecycle-of-a-create]] — the end-to-end write flow.
 - [[query-lifecycle]] — the read flow `findOne`/`findMany` ride on.
 - [[MetadataStorage]] — what the repository reads to compose SQL.
 - [[Layered Architecture]] — `Repository` is layer 3 in the five-layer stack.
 - [[0002-repository-with-lazy-query-builder]] — the ADR.
 - [[0005-no-any-type-driven-api]] — the ADR that makes the type-level contract enforceable.
+- [[0008-pk-aware-compile-time]] — the ADR that ties the four PK-using signatures to the brand.
 
 ## Sources
 
-- `.raw/repository-contract.md` (the pin-down for everything on this page)
+- `.raw/repository-contract.md` (the pin-down for the operations table and `requirePrimaryKey` gate)
 - `.raw/architecture-overview.md` § "The Boundary Between Repository and Query Builder"
+- `.raw/pk-aware-repository-methods.md` (the design memo for the 2026-04-30 signature changes)

@@ -17,6 +17,60 @@ Append-only record of every wiki operation. Newest entries on top. Never edit pa
 
 ---
 
+## 2026-04-30 — lint | Health check after PK-aware-repository-methods ingest
+
+**Report:** [[lint-report-2026-04-30]].
+
+**Headline: ✅ wiki health green.** All three new pages from the PK-brand ingest carry complete frontmatter and ≥7 inbound wikilinks each. Zero orphans, zero stale claims, zero unresolved contradictions.
+
+**Findings (after filtering 33 false positives — backtick-wrapped format docs, Obsidian Bases file references, escaped-pipe table cells, prior lint report contents):**
+
+- **1 genuine dead wikilink** — `[[idx-discriminator-collision]]` in `wiki/sources/drift-d5-discriminator-index.md:85`, framed in-line as *"Optional future open question"*. Author-intentional placeholder; pre-existing; not fixed.
+- **1 minor frontmatter drift** — `wiki/meta/_index.md` had `page_count: 0` despite a lint report existing. **Fixed:** bumped to 2 (counts both lint reports) and added entries for both reports plus the `[[issues|Issue tracker]]` Base.
+
+**Files touched:**
+
+- `wiki/meta/lint-report-2026-04-30.md` — new.
+- `wiki/meta/_index.md` — frontmatter `page_count: 0 → 2`; `updated: 2026-04-29 → 2026-04-30`; body now lists both lint reports + the issues Base.
+- `wiki/log.md` — this entry.
+
+**Suggested follow-up (deferred, not done in this lint):**
+
+- Optional: file `wiki/questions/idx-discriminator-collision.md` to upgrade the placeholder hint into a tracked open question.
+- Optional: revisit `wiki/comparisons/orms-summary.md` to surface "compile-time PK enforcement via runtime-erased brand" as a distinctive contribution row. Tracked as an active thread in `wiki/hot.md`.
+
+---
+
+## 2026-04-30 — ingest | PK-aware Repository methods
+
+**Source:** `.raw/pk-aware-repository-methods.md` (post-implementation design memo, 250 lines).
+
+**Headline:** the compile-time PK-enforcement direction that `repository-contract` started for `create()` is now finished for `findById` / `delete` / `update`. A new structural brand `PrimaryKey<V>` lives at the field-declaration site; four Repository signatures change to consume it; the silent `update({ name: 'x' })` bug on autogen entities is closed at the type level.
+
+**Pages created:**
+
+- [[sources/pk-aware-repository-methods]] — source synthesis with the full alternatives analysis (A: brand on field type *(chosen)*, B: generic `Repository<T, PK>`, C: runtime-only).
+- [[PrimaryKey Brand]] — concept page. Brand asymmetry (`PrimaryKey<V>` is a subtype of `V`, so branded → unbranded works freely; the reverse needs a cast) is the load-bearing ergonomic trick that keeps call sites brand-free.
+- [[0008-pk-aware-compile-time]] — first post-rollout ADR. Alternatives B and C documented for posterity; B's footgun (runtime/compile-time disagreement of `PK` generic vs `@PrimaryColumn` metadata) is the disqualifying argument for a publishable library.
+
+**Pages updated:**
+
+- [[Repository]] — Operations table now shows `findById(key: PKInput<T>)` / `delete(key: PKInput<T>)` / `update(entity: UnbrandedT<T> & PKInput<T>)` / `create(entity: UnbrandedT<T>): Promise<PKOutput<T>>`. Runtime section: `create()` returns `PKOutput<T>` (branded), not `Partial<T>`. `requirePrimaryKey` parameter widened to `PKInput<T> | UnbrandedT<T>`.
+- [[Repository Pattern]] — fourth refinement note added; `create()` example comment updated; `@PrimaryColumn` § now mentions both overloads carry the brand term.
+- [[Autogeneration]] — silent-`update({ name: 'x' })` bug now noted as closed by the brand work; example entities updated to declare `id?: PrimaryKey<number>` / `id?: PrimaryKey<string>` / `externalId!: PrimaryKey<string>`.
+- [[Conditions Proxy]] — proxy type changed from `FieldConditionBuilder<T[K]>` to `FieldConditionBuilder<Unbrand<T[K]>>`; refinement note added explaining why `c.id?.eq(1)` accepts a plain literal.
+- [[ECMAScript Stage-3 Decorators]] — new § "The constraint-flip pattern (read-only)" generalizing the pattern that now governs both nullability and the brand.
+- [[index]] — `page_count: 58 → 61`; new entries in Decisions, Concepts, Sources sections.
+- [[concepts/_index]] / [[decisions/_index]] / [[sources/_index]] — counts and listings refreshed.
+- [[hot]] — refreshed below.
+- [[log]] — this entry.
+
+**Manifest:** `.raw/.manifest.json` updated with the new source's hash and pages_created/pages_updated arrays.
+
+**Key insight:** the `PrimaryKey<V>` brand had to live at the *declaration site* — Stage-3 decorators can READ a field's declared type but cannot inject type information into it. Option B (a `PK` generic on `Repository<T, PK>`) was disqualified because the declaration-site decorator and the construction-site generic could disagree silently. Putting the brand on the field unifies the two: `@PrimaryColumn`'s overload constraint and the field type are checked against each other at the same call.
+
+---
+
 ## 2026-04-30 — correction | Remove `support-date-operators` open question
 
 **Reverts part of the previous entry.** [[support-date-operators]] (filed earlier today as *medium / M*) is removed. Owner's call: the existing nine-method `FieldConditionBuilder` surface — `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `isNull`, `isNotNull`, `in` — already supports date columns since `T[K] = Date` flows through the value parameter. Date queries like `u.createdAt!.gt(new Date(...))` work today. Anything that *doesn't* work is a bug, not an open question, and will be tracked through code tests rather than a wiki issue.

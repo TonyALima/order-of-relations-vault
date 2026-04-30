@@ -7,7 +7,7 @@ tags:
   - meta
   - index
 status: developing
-page_count: 58
+page_count: 61
 related: []
 sources: []
 ---
@@ -59,6 +59,7 @@ Architecture Decision Records. Append-only, dated.
 - [[0005-no-any-type-driven-api]] — strict no-`any`; type-driven public API.
 - [[0006-tdd-rhythm]] — red-green-refactor with `bun test`, colocated tests.
 - [[0007-bun-toolchain]] — Bun is the single toolchain.
+- [[0008-pk-aware-compile-time]] — `PrimaryKey<V>` brand for compile-time PK enforcement on `findById` / `delete` / `update`.
 - See [[decisions/_index]] for the rolling index.
 
 ## Dependencies — `wiki/dependencies/`
@@ -88,7 +89,8 @@ One synthesis page per item in `.raw/`.
 - [[sources/decorator-metadata-storage|Decorator Metadata Storage]] — storage shape, three-symbol scheme, lazy resolution, failure modes (2026-04-29).
 - [[sources/query-builder-design|Query Builder Design]] — mutable builder, where-callback signature, SQL-composition safety; corrects two claims (2026-04-29).
 - [[sources/repository-contract|Repository Contract]] — by-key operations, `requirePrimaryKey` gate, `create(entity: T)` type-shaped contract, autogeneration (2026-04-29).
-- ✅ All five primary `.raw/` sources ingested.
+- [[sources/pk-aware-repository-methods|PK-aware Repository Methods]] — `PrimaryKey<V>` brand finishes the compile-time direction; updated signatures for `findById` / `delete` / `update` / `create` (2026-04-30).
+- ✅ All five primary `.raw/` sources ingested; one follow-up design memo filed.
 
 **Drift corrections (2026-04-29):**
 
@@ -124,6 +126,7 @@ Ideas, patterns, frameworks (e.g., Stage-3 decorators, repository pattern, lazy 
 - [[Parameterized SQL]] — placeholders + bound parameters; the only allowed query form.
 - [[sqlJoin]] — the only sanctioned fragment joiner.
 - [[Autogeneration]] — explicit-only PK auto-generation; `clientSide` / `dbSide` strategies.
+- [[PrimaryKey Brand]] — `PrimaryKey<V>` structural brand on PK fields; powers compile-time PK enforcement on `findById` / `delete` / `update`.
 - [[Schema Migrations]] — *seed* — placeholder concept page; no migration system is built yet.
 - [[Dependency Injection Container]] — minimal singleton container (planned, not yet implemented).
 - See [[concepts/_index]] for the rolling index.

@@ -2,9 +2,9 @@
 type: domain
 title: "Concepts"
 subdomain_of: ""
-page_count: 12
+page_count: 13
 created: 2026-04-29
-updated: 2026-04-29
+updated: 2026-04-30
 tags:
   - meta
   - concepts
@@ -30,6 +30,7 @@ Ideas, patterns, and frameworks. A concept page defines what something is and wh
 - [[Parameterized SQL]] — placeholders + bound parameters; the only allowed query form (no `sql.unsafe`).
 - [[sqlJoin]] — the only sanctioned helper for joining SQL fragments; replaces hand-rolled `reduce` patterns.
 - [[Autogeneration]] — explicit-only PK auto-generation with `clientSide` / `dbSide` strategies; commit `3aa354b` removed implicit SERIAL.
+- [[PrimaryKey Brand]] — `PrimaryKey<V>` structural brand; brand asymmetry keeps call sites brand-free; powers compile-time PK enforcement on `findById` / `delete` / `update`.
 - [[Schema Migrations]] — *seed* — placeholder concept page; no migration system implemented yet. Lists the load-bearing design choices a future implementation would face.
 - [[Dependency Injection Container]] — minimal singleton container for `@Service` / `@InjectRepository` wiring (planned, not yet implemented).
 

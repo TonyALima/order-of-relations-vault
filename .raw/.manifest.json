@@ -237,6 +237,29 @@
         "wiki/log.md",
         "wiki/sources/_index.md"
       ]
+    },
+    ".raw/pk-aware-repository-methods.md": {
+      "hash": "0a63ae70264cdf3ee9d96f66d9abd533",
+      "ingested_at": "2026-04-30",
+      "pages_created": [
+        "wiki/sources/pk-aware-repository-methods.md",
+        "wiki/concepts/PrimaryKey Brand.md",
+        "wiki/decisions/0008-pk-aware-compile-time.md"
+      ],
+      "pages_updated": [
+        "wiki/components/Repository.md",
+        "wiki/concepts/Repository Pattern.md",
+        "wiki/concepts/Autogeneration.md",
+        "wiki/concepts/Conditions Proxy.md",
+        "wiki/concepts/ECMAScript Stage-3 Decorators.md",
+        "wiki/brief.md",
+        "wiki/index.md",
+        "wiki/hot.md",
+        "wiki/log.md",
+        "wiki/sources/_index.md",
+        "wiki/concepts/_index.md",
+        "wiki/decisions/_index.md"
+      ]
     }
   }
 }

@@ -15,11 +15,35 @@ sources: []
 
 ## Last Updated
 
-2026-04-30. **One new open question on the query builder: [[support-and-or-conditions]] (*high / L*).** Earlier today's filing of `support-date-operators` was retracted by the owner — the existing nine-method `FieldConditionBuilder` already covers date columns via the `T[K] = Date` value-parameter pathway, so any breakage there is a bug for code tests, not a wiki issue. Open-question count: 6 → 7. Wiki page count: 57 → 58.
+2026-04-30 (later in day). **Major ingest:** `.raw/pk-aware-repository-methods.md` — a post-implementation design memo finishing the compile-time PK-enforcement direction for `findById` / `delete` / `update` / `create`. Three pages created (one source, one concept, one ADR). Five pages updated. Wiki page count: 58 → 61. ADR count: 7 → 8 (first post-rollout ADR).
 
-## Open question addition (2026-04-30)
+## Latest ingest (2026-04-30) — `PrimaryKey<V>` brand work
 
-**[[support-and-or-conditions]]** — extend the `where` callback from a flat `(Condition | undefined)[]` AND-list to a real boolean tree (AND / OR / NOT, nested groups). Anchored in [[QueryBuilder]] § Scope: *"No OR / nested boolean trees. `where` is a flat AND list. A real boolean DSL is significant API surface; the source defers it until at least one concrete use case appears."* Three options sketched: `Or`/`And` combinator helpers (TypeORM/Sequelize-flavoured; lightest-touch); recursive object tree (Prisma-flavoured; replaces the proxy); method chaining (TypeORM legacy; conflicts with [[apply-options-accumulation]]). High impact because there is no `qb.raw(...)` escape hatch — without OR, complex predicates can't be expressed at all without leaving the builder.
+**What shipped (per source — every snippet matches code):**
+
+- New brand: `PrimaryKey<V> = V & { readonly [__pkBrand]: true }` (intersection type, runtime-erased) plus `Unbrand<V>` to strip it.
+- `@PrimaryColumn`'s two overloads now require the brand on the field type:
+  - With autogen → `NullableField<V> & NullablePrimaryKey<V>` (field must be `?` AND branded).
+  - Without autogen → `NotNullableField<V> & PrimaryKey<V>` (field must be `!` AND branded).
+- Repository signatures changed:
+  - `findById(key: PKInput<T>): Promise<T | null>`
+  - `delete(key: PKInput<T>): Promise<void>`
+  - `update(entity: UnbrandedT<T> & PKInput<T>): Promise<void>`
+  - `create(entity: UnbrandedT<T>): Promise<PKOutput<T>>` (return changed from `Partial<T>` to `PKOutput<T>`, branded)
+  - `findOne` / `findMany` UNCHANGED (they take `FindOptions<T>`, not raw entity shapes)
+- `Conditions<T>` switched to `FieldConditionBuilder<Unbrand<T[K]>>` so `c.id?.eq(1)` accepts a plain literal.
+- `requirePrimaryKey`'s parameter widened from `Partial<T>` to `PKInput<T> | UnbrandedT<T>` (the new strict shapes aren't assignable to `Partial<T>` because of brand asymmetry).
+
+**Brand asymmetry (the load-bearing ergonomic trick):**
+`PrimaryKey<V>` is a SUBTYPE of `V`. So branded → unbranded works freely (intersection narrows to its left operand); unbranded → branded requires a cast. Outputs stay branded; inputs accept unbranded values via `Unbrand<V>`. Round-trip `repo.update(await repo.findById({ id: 1 }))` works without casts. Brand only shows up at the **declaration** site.
+
+**Why option A (brand) over B (generic `Repository<T, PK>`) or C (runtime-only):**
+
+1. Consistency with the existing compile-time direction (`create-required-fields` set the precedent).
+2. Option B's footgun: `Repository<User, 'name'>` would typecheck silently and disagree with `@PrimaryColumn` metadata at runtime. Unacceptable for a publishable library — declaration-site enforcement closes that gap.
+3. Option C closes the silent-bug case but leaves `findById({})` compiling. Step backward from the existing direction.
+
+**Closes:** the silent `update({ name: 'x' })` bug on autogen entities. Autogen PKs are declared `id?: PrimaryKey<number>` (the `?` is load-bearing for `create()`'s "omittable" semantics); previously `update(entity: T)` accepted `{ name: 'x' }` because `T['id']` was optional. Now `PKInput<T>` requires every PK key non-undefined regardless of the optional modifier on `T`.
 
 ## Convention reinforced (2026-04-30)
 
@@ -37,9 +61,9 @@ Every page in `wiki/comparisons/` follows this skeleton:
 6. `## Why OOR matters in a crowded market` — closing argument.
 7. `## Sources`.
 
-Sections explicitly omitted: "When to reach for which", "Where OOR is behind", "Maturity" row, "Where they converge".
-
 **Equal-value rule:** features with a fully-scoped open-question page (axes spelled out, decorator surface defined, change-surface described) are part of OOR's contribution. The new `support-and-or-conditions` does **not yet** clear the equal-value bar for the comparison pages — scoped enough to be tracked, not yet scoped enough to claim. Promote when an ADR closes it.
+
+**Note:** the PK brand work just shipped (2026-04-30) and may be worth surfacing on the comparison pages — "compile-time PK enforcement on `findById`/`update`/`delete` via a runtime-erased brand" is a distinctive contribution. None of TypeORM / Drizzle / Prisma do exactly this. Defer until a comparison-update pass; keep this note as a reminder.
 
 ## Comparison contribution headlines (TCC-defense form)
 
@@ -48,42 +72,40 @@ Sections explicitly omitted: "When to reach for which", "Where OOR is behind", "
 - **vs Prisma** — "TypeScript itself as the schema."
 - **Stage-3 vs legacy** — "Right place, right time on the dialect transition."
 
-## Summary matrix row-patterns ([[orms-summary]])
+## Key facts (current state, post-2026-04-30 PK work)
 
-1. **OOR ✅ + all competitors ✅** — table-stakes (parameterized SQL by default, lazy chainable builder).
-2. **OOR ✅ + TypeORM ✅ + Prisma/Drizzle ❌** — the OO ergonomic profile.
-3. **OOR ✅ + Prisma/Drizzle ✅ + TypeORM ❌** — modern guarantees TypeORM is locked out of.
-4. **OOR ✅ alone** — distinctive contributions (no `unsafe` SQL escape hatch in either user code OR library internals; auto-emitted STI discriminator index; FK demotion at the type level; compile-time rejection of partial entities on `create()`).
+- **Repository surface = exactly 6 methods.** `findMany`, `findOne`, `findById`, `create`, `delete`, `update`. There is no `find()`.
+- **`findById`/`delete` accept `PKInput<T>`** (every PK key, all required, all non-undefined, **unbranded**). Not `Partial<T>` anymore.
+- **`update` accepts `UnbrandedT<T> & PKInput<T>`** — full entity shape, plus PK fields required regardless of `T`'s optional modifier.
+- **`create` returns `PKOutput<T>`** (PK fields only, **branded**) — not `Partial<T>`.
+- **`FindOptions<T>` carries TWO fields**: `where` (replaces conditions) and `inheritance` (pushes a discriminator predicate). Untouched by the PK brand work.
+- **`Conditions<T>` uses `Unbrand<T[K]>` per field.** `c.id?.eq(1)` accepts a plain literal.
+- **`FieldConditionBuilder<V>` exposes 9 methods, uniform across `V`.**
+- **`@PrimaryColumn` enforces the brand at the declaration site** via the constraint-flip pattern (second use of the pattern after `@Nullable` / `@NotNullable`).
+- **STI schema-create emits THREE statements per root**: `CREATE TABLE`, `ALTER ADD COLUMN discriminator`, `CREATE INDEX idx_discriminator`.
+- **`COLUMN_TYPE` is a closed enum (~50 PG types)**; `toForeignKeyType` demotes SERIAL/SMALLSERIAL/BIGSERIAL → INTEGER/SMALLINT/BIGINT for FK columns.
 
 ## Drift outcomes (still in scope)
 
 - **D1 — `Repository.find()` does not exist.** Only `findOne` / `findMany` / `findById`.
 - **D3 — `FindOptions.inheritance` is real.** `InheritanceSearchType` (`ALL` / `ONLY` / `SUBCLASSES`).
-- **D4 — `FieldConditionBuilder` operator inventory.** Nine methods (`eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `isNull`, `isNotNull`, `in`), uniform across `V` — date columns are covered through the value-parameter `V = Date` pathway.
-- **D5 — implicit `idx_discriminator` index.** Three statements per STI root: `CREATE TABLE`, `ALTER ADD COLUMN discriminator`, `CREATE INDEX idx_discriminator`.
-
-## Key facts (current state)
-
-- **Repository surface = exactly 6 methods.** `findMany`, `findOne`, `findById`, `create`, `delete`, `update`. There is no `find()`.
-- **`FindOptions<T>` carries TWO fields**: `where` (replaces conditions) and `inheritance` (pushes a discriminator predicate).
-- **`FieldConditionBuilder<V>` exposes 9 methods, uniform across `V`** — operator surface is intentionally type-agnostic; covers dates through the value parameter.
-- **`where` returns a flat `(Condition | undefined)[]`** joined by AND in SQL emission — flatness is what [[support-and-or-conditions]] proposes to break.
-- **STI schema-create emits THREE statements per root**: `CREATE TABLE`, `ALTER ADD COLUMN discriminator`, `CREATE INDEX idx_discriminator`.
-- **`COLUMN_TYPE` is a closed enum (~50 PG types)**; `toForeignKeyType` demotes SERIAL/SMALLSERIAL/BIGSERIAL → INTEGER/SMALLINT/BIGINT for FK columns.
+- **D4 — `FieldConditionBuilder` operator inventory.** Nine methods, uniform across `V`.
+- **D5 — implicit `idx_discriminator` index.** Three statements per STI root.
 
 ## Open Questions (7 — tracked as issues — see [[issues|Issue tracker]])
 
 - 🔓 [[support-one-to-many]] — *high / L* — implement `@OneToMany` / `@ManyToOne` (the `TO_MANY` enum member is currently dead).
-- 🔓 [[support-and-or-conditions]] — *high / L* — boolean tree in `where` (AND / OR / NOT, nested groups). **NEW 2026-04-30.**
+- 🔓 [[support-and-or-conditions]] — *high / L* — boolean tree in `where` (AND / OR / NOT, nested groups).
 - 🔓 [[support-many-to-many]] — *medium / L* — implement `@ManyToMany` with a synthesized join table.
 - 🔓 [[decorator-order-independence]] — *medium / S* — order-independent `@Column` / `@Nullable`.
-- 🔓 [[support-user-indexes]] — *medium / M* — `@Index` / `@Unique` + `CREATE INDEX` emission. Folds in `idx_discriminator` naming fix.
+- 🔓 [[support-user-indexes]] — *medium / M* — `@Index` / `@Unique` + `CREATE INDEX` emission.
 - 🔓 [[get-one-limit-1]] — *low / S* — `getOne()` slicing vs `LIMIT 1`?
 - 🔓 [[apply-options-accumulation]] — *low / S* — `applyOptions()` replace vs accumulate?
 
 ## Active threads
 
-- **Comparison pages link to entity pages** `[[Drizzle ORM]]`, `[[Prisma]]`, and `[[TypeORM]]`. Light entity stubs would close those wikilinks; not yet filed.
+- **Comparison pages** — should be revisited to surface the PK brand work as a distinctive contribution row in [[orms-summary]].
 - **Drift backlog:** `src/core/orm-error/`, `src/decorators/nullable/`, `src/decorators/relation/` still uncovered.
 - **`examples/relations/` page is a stub** — files weren't opened in the drift pass; expand once read.
-- **Suggested next action:** `lint the wiki` — one new question page added with cross-references on [[QueryBuilder]] and [[Conditions Proxy]]; quick sweep for orphans / dead links / frontmatter gaps.
+- **Migration footprint of the PK brand work** — every example fixture and entity in tests needs `PrimaryKey<V>` on PK fields. If any haven't been migrated yet, they will fail to typecheck against the new `@PrimaryColumn` overloads. Worth a code spot-check.
+- **Suggested next action:** `lint the wiki` — three new pages added with cross-references on five existing pages; quick sweep for orphans / dead links / frontmatter gaps.

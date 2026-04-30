@@ -2,9 +2,9 @@
 type: domain
 title: "Sources"
 subdomain_of: ""
-page_count: 12
+page_count: 13
 created: 2026-04-29
-updated: 2026-04-29
+updated: 2026-04-30
 tags:
   - meta
   - sources
@@ -18,7 +18,7 @@ sources: []
 
 One synthesis page per item in `.raw/`. Each page summarizes the source, lists its key claims, and links to every wiki page derived from it.
 
-> [!check] Twelve sources ingested
+> [!check] Thirteen sources ingested
 > **Primary (5):**
 > - ✅ `welcome.md` → [[sources/welcome]]
 > - ✅ `architecture-overview.md` → [[sources/architecture-overview]]
@@ -34,6 +34,9 @@ One synthesis page per item in `.raw/`. Each page summarizes the source, lists i
 > - ✅ `drift-m3-module-pages.md` → [[sources/drift-m3-module-pages]]
 > - ✅ `drift-m5-sql-types-module.md` → [[sources/drift-m5-sql-types-module]]
 > - ✅ `drift-m6-examples-pointer.md` → [[sources/drift-m6-examples-pointer]]
+>
+> **Follow-up design memos (1):**
+> - ✅ `pk-aware-repository-methods.md` → [[sources/pk-aware-repository-methods]]
 
 ## Source pages
 
@@ -42,6 +45,10 @@ One synthesis page per item in `.raw/`. Each page summarizes the source, lists i
 - [[sources/decorator-metadata-storage|Decorator Metadata Storage]] — pin-down on storage shape, three-symbol scheme (resolved against code), lazy resolution, failure modes. (2026-04-29)
 - [[sources/query-builder-design|Query Builder Design]] — mutable single-owner builder, `where`-callback signature, SQL-composition safety, two terminal methods today. Corrects two claims from earlier wiki pages. (2026-04-29)
 - [[sources/repository-contract|Repository Contract]] — by-key operations, `requirePrimaryKey` gate, `create(entity: T)` type-shaped contract, autogeneration strategies, single error type. Sharpens the read/write split. (2026-04-29)
+
+### Follow-up design memos
+
+- [[sources/pk-aware-repository-methods|PK-aware Repository Methods]] — finishes the compile-time direction `repository-contract` started: `PrimaryKey<V>` brand on PK fields drives new signatures for `findById` / `delete` / `update` / `create`; closes the silent-`update({ name: 'x' })` bug at the type level. (2026-04-30)
 
 ### Drift corrections (post-audit)
 

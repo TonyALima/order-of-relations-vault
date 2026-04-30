@@ -2,9 +2,9 @@
 type: domain
 title: "Decisions (ADRs)"
 subdomain_of: ""
-page_count: 7
+page_count: 8
 created: 2026-04-29
-updated: 2026-04-29
+updated: 2026-04-30
 tags:
   - meta
   - decisions
@@ -20,7 +20,7 @@ Architecture Decision Records. Each ADR captures a *load-bearing* design call an
 
 ## Decision pages
 
-All seven seeded ADRs from `.raw/welcome.md` have been filed:
+All seven seeded ADRs from `.raw/welcome.md` have been filed; one post-rollout ADR has been added.
 
 - [[0001-stage-3-decorators]] — use ECMAScript Stage-3 decorators; reject `experimentalDecorators` + `reflect-metadata`.
 - [[0002-repository-with-lazy-query-builder]] — `Repository<T>` as the entry point; `find()` returns a lazy `QueryBuilder<T>`.
@@ -29,6 +29,7 @@ All seven seeded ADRs from `.raw/welcome.md` have been filed:
 - [[0005-no-any-type-driven-api]] — strict `@typescript-eslint/no-explicit-any`; type-driven public API.
 - [[0006-tdd-rhythm]] — red-green-refactor with `bun test`, colocated `*.test.ts`.
 - [[0007-bun-toolchain]] — Bun is the only toolchain (runtime, package manager, test runner, bundler).
+- [[0008-pk-aware-compile-time]] — `PrimaryKey<V>` brand on PK field types; powers compile-time PK enforcement on `findById` / `delete` / `update`. *(2026-04-30 — first post-rollout ADR.)*
 
 ## ADR naming convention
 
