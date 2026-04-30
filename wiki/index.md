@@ -7,7 +7,7 @@ tags:
   - meta
   - index
 status: developing
-page_count: 52
+page_count: 57
 related: []
 sources: []
 ---
@@ -145,14 +145,21 @@ Wiki front-doors for the runnable scenarios in `examples/`.
 
 ## Comparisons — `wiki/comparisons/`
 
-Side-by-side analyses (e.g., OOR vs TypeORM vs Drizzle).
+Side-by-side analyses defending OOR's design decisions against the prevailing alternatives.
 
-- _none yet — see [[comparisons/_index]]_
+- [[orms-summary]] — feature matrix of OOR's contributions across all three competitors; the at-a-glance scoreboard.
+- [[oor-vs-typeorm]] — same shape, broader scope, weaker safety guarantees; receipts for ADR 0002's "no TypeORM-style fluent API" rejection.
+- [[oor-vs-drizzle]] — opposite philosophies (typed SQL composer vs typed ORM); receipts for ADR 0002's "no raw query builder only" rejection.
+- [[oor-vs-prisma]] — different categories (schema-DSL + codegen vs class + runtime metadata); the source-of-truth wedge.
+- [[stage-3-vs-legacy-decorators]] — dialect-level deep-dive behind [[0001-stage-3-decorators]].
+- See [[comparisons/_index]] for the rolling index.
 
 ## Questions — `wiki/questions/`
 
 Filed answers to queries, plus **open questions** kept visible until resolved. Open questions carry `impact` + `effort` frontmatter and surface in the [[issues|Issue tracker]] Base.
 
+- 🔓 [[support-one-to-many]] — *open · high / L* — implement `@OneToMany` / `@ManyToOne` (the `TO_MANY` enum member is currently dead).
+- 🔓 [[support-many-to-many]] — *open · medium / L* — implement `@ManyToMany` with a synthesized join table.
 - 🔓 [[decorator-order-independence]] — *open · medium / S* — could `@Column` / `@Nullable` work regardless of decoration order?
 - 🔓 [[support-user-indexes]] — *open · medium / M* — add `@Index` / `@Unique` so users can declare indexes?
 - 🔓 [[get-one-limit-1]] — *open · low / S* — `getOne()` slicing vs. `LIMIT 1`?

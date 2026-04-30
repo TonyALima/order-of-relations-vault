@@ -17,6 +17,100 @@ Append-only record of every wiki operation. Newest entries on top. Never edit pa
 
 ---
 
+## 2026-04-30 — file | Add `orms-summary` feature matrix
+
+**Filed:** [[orms-summary]] — single-page feature matrix comparing OOR's contributions against TypeORM, Prisma, and Drizzle. ~30 rows grouped under five sections: Foundation, API shape, SQL safety, Modeling, Toolchain.
+
+**Cell vocabulary:** ✅ delivered, ⏳ planned and well-scoped (equal-value rule), 🟡 partial / not first-class, ❌ not delivered, — not applicable (different mechanism). The `—` marker is load-bearing: writing `Stage-3 decorators: Prisma ❌` would be misleading because Prisma doesn't use decorators on classes at all — the question doesn't translate.
+
+**How it relates to the four detailed pages:** the matrix is the at-a-glance scoreboard; [[oor-vs-typeorm]], [[oor-vs-drizzle]], [[oor-vs-prisma]], [[stage-3-vs-legacy-decorators]] hold the long-form thesis behind each row. The summary page closes with a "How to read this matrix" section that names four row-patterns:
+
+1. OOR ✅ and all competitors ✅ — table-stakes the field has converged on.
+2. OOR ✅ + TypeORM ✅ but Prisma/Drizzle ❌ — the OO ergonomic profile.
+3. OOR ✅ + Prisma/Drizzle ✅ but TypeORM ❌ — modern guarantees TypeORM is locked out of.
+4. OOR ✅ alone — distinctive contributions (no `unsafe` SQL escape hatch in the public API or library internals; auto-emitted STI discriminator index; FK demotion at the type level; compile-time rejection of partial entities on `create()`).
+
+**A "Notes on selected cells" section** disambiguates rows where the binary is misleading — e.g., TypeORM scores 🟡 (not ✅) on `Repository<T>` per entity because while the class exists, it's not the *single* entry-point; Prisma scores ✅ on "one mental model" because there's only one query shape, not because it solves the simple-vs-composed split the same way.
+
+**Files touched:**
+
+- `wiki/comparisons/orms-summary.md` — new.
+- `wiki/comparisons/_index.md` — `page_count: 4 → 5`, added "Summary matrix" subsection at the top of the comparison pages list.
+- `wiki/index.md` — `page_count: 56 → 57`, added the new page to the comparisons list.
+- `wiki/hot.md` — refreshed.
+
+---
+
+## 2026-04-30 — refactor | Comparisons reframed as TCC defense material
+
+**What changed:** all four comparison pages ([[oor-vs-typeorm]], [[oor-vs-drizzle]], [[oor-vs-prisma]], [[stage-3-vs-legacy-decorators]]) rewritten with a TCC-defense frame instead of a critical/pragmatic-consumer frame.
+
+**Reframing principles applied:**
+
+1. **Question being answered changed.** Before: "Should I pick OOR or X for my project?" After: "What does OOR contribute that the field didn't already have? Why does it matter in a crowded market?"
+2. **Equal-value rule for planned features.** A feature with a fully-scoped open-question page (axes spelled out, decorator surface defined, change-surface described) is now listed as part of OOR's contribution rather than as a "where OOR is behind" gap. Examples promoted to feature-equal: `@Index` / `@Unique` ([[support-user-indexes]]), decorator-order independence ([[decorator-order-independence]]). Seed-only concepts ([[Schema Migrations]]) are not claimed.
+3. **Sections removed:**
+   - `## When to reach for which` — pragmatic consumer-decision aid that conceded use-cases. Removed from all three ORM-vs-ORM pages.
+   - `## Where OOR is behind (by feature, not by design)` — gap callouts that worked against the TCC's "we're selling an idea" frame. Removed from all four pages.
+4. **Sections added:**
+   - `## What OOR brings that's new` — bullet-list contribution summary up top, replaces the buried "design contribution" framing.
+   - `## OOR's contribution, dimension by dimension` — replaces "where they diverge — by design"; same prose backbone but framed as positive contributions, not neutral observations.
+   - `## Why OOR matters in a crowded market` — closing argument; replaces the prior `## Verdict` (verdict still in frontmatter).
+5. **Tone shift:** from "honest about gaps" to "confident about the design." The accuracy of facts in the dimensions tables is unchanged — what changed is the framing of OOR's positions (e.g., PG-only is now "PostgreSQL, deeply" with a contribution case, not a "narrow scope" concession).
+6. **Stage-3 page got a custom reframe.** It's not OOR vs an ORM but the dialect choice OOR's already made. Recast as: "Stage-3 is the bet, and here's why OOR is well-positioned to make it." `## Where legacy wins` renamed to `## What OOR accepts as the cost` — same content, repositioned as known/accepted tradeoffs that match OOR's design rather than defects in the dialect choice.
+
+**Why this matters for the TCC:** the wiki is meant to be the long-form receipts for the thesis defense. Pages that read as neutral comparisons concede the academic argument before it begins. The reframed pages are receipts for the contribution, not receipts for a decision tree.
+
+**Files touched:**
+
+- `wiki/comparisons/oor-vs-typeorm.md` — rewritten end-to-end.
+- `wiki/comparisons/oor-vs-drizzle.md` — rewritten end-to-end.
+- `wiki/comparisons/oor-vs-prisma.md` — rewritten end-to-end.
+- `wiki/comparisons/stage-3-vs-legacy-decorators.md` — rewritten end-to-end.
+- `wiki/comparisons/_index.md` — updated convention notes to remove "where OOR is behind" pattern, add equal-value rule, add TCC-frame guidance for future comparisons.
+- `wiki/hot.md` — refreshed.
+
+**Convention now established for `wiki/comparisons/`:** every page leads with `## What OOR brings that's new` (bullets), then frontmatter `verdict:`, then dimensions table, then `## OOR's contribution, dimension by dimension` prose, then `## Why OOR matters in a crowded market` closing argument. No consumer-decision sections, no gap callouts.
+
+---
+
+## 2026-04-29 — edit | Drop "Maturity" row from all comparison tables
+
+**What changed:** removed the **Maturity** row from the dimensions tables in [[oor-vs-typeorm]], [[oor-vs-drizzle]], [[oor-vs-prisma]]. The row compared "TCC pre-1.0" against well-funded multi-year projects with tens of thousands of GitHub stars — a dimension where the comparison is structurally meaningless and concedes ground without illuminating anything. Frontmatter `dimensions:` arrays updated to drop `maturity` from each.
+
+**Kept as standing convention:** comparison-table dimensions should be axes where the libraries can be meaningfully compared on architecture or features. Project-maturity metrics belong in entity pages (TypeORM, Prisma, Drizzle), not in OOR-vs-X tables.
+
+---
+
+## 2026-04-29 — file | Build out `wiki/comparisons/` (4 new pages)
+
+**Filed:** four comparison pages closing the "no comparisons ingested yet" gap on [[comparisons/_index]].
+
+- [[oor-vs-typeorm]] — TypeORM v0.3.28 (2025-12). Same shape (decorators, `Repository<T>`, lazy builder, STI), broader scope (12 DBs vs PG-only), weaker safety guarantees (raw SQL fragments are the primary `where()` API; no `sql.unsafe` ban). Receipts for [[0002-repository-with-lazy-query-builder]]'s rejection of "TypeORM-style `Repository.createQueryBuilder()`."
+- [[oor-vs-drizzle]] — Drizzle 1.0-beta.22 (2026-04-16). Opposite philosophy: typed SQL composer (`pgTable` + `db.select().from(...).where(eq(...))`), no Repository abstraction, no native STI. Receipts for ADR 0002's rejection of "no repositories, raw query builder only."
+- [[oor-vs-prisma]] — Prisma v7.8.0 (Apr 2026, post-Rust-free architecture). Different category — schema-DSL + codegen vs class + runtime metadata. Bundle/runtime objections are now stale; the live wedge is source-of-truth (PSL file + `prisma generate` vs decorated TS class).
+- [[stage-3-vs-legacy-decorators]] — dialect deep-dive behind [[0001-stage-3-decorators]]. Stage-3 wins on standardization, polyfill-freedom, toolchain alignment; legacy wins on `design:type` runtime info and parameter decorators (Stage-3 still doesn't have them — the NestJS/Inversify migration blocker).
+
+**Research method:** four parallel agents fetched current upstream docs (typeorm.io, orm.drizzle.team, prisma.io, tc39 proposal-decorators, TypeScript 5.0 release notes) and produced factual briefs grouped by 10-11 dimensions each. Each comparison page then maps those facts to OOR's positioning, with `> [!gap]` callouts where OOR is *behind by feature, not by design* (indexes, migrations, edge runtime support).
+
+**Why the structure:** every comparison follows the same skeleton — frontmatter `verdict` line, dimensions table (~12 rows), "where they converge / diverge — by design" prose, "where OOR is behind (by feature, not by design)" gap callouts cross-linking the relevant open questions ([[support-user-indexes]], [[Schema Migrations]], [[support-one-to-many]] / [[support-many-to-many]] where applicable), "when to reach for which" pragmatic split, one-paragraph verdict, sources.
+
+**Cross-links added:** all four ADRs referenced ([[0001-stage-3-decorators]], [[0002-repository-with-lazy-query-builder]], [[0004-parameterized-sql-only]], [[0005-no-any-type-driven-api]]) — comparisons are readable as receipts for those decisions.
+
+**Files touched:**
+
+- `wiki/comparisons/oor-vs-typeorm.md` — new.
+- `wiki/comparisons/oor-vs-drizzle.md` — new.
+- `wiki/comparisons/oor-vs-prisma.md` — new.
+- `wiki/comparisons/stage-3-vs-legacy-decorators.md` — new.
+- `wiki/comparisons/_index.md` — `page_count: 0 → 4`, `status: seed → developing`, listed all four pages with one-line hooks, added "Patterns to follow when adding a new comparison" section.
+- `wiki/index.md` — replaced "_none yet_" with the four new entries, bumped `page_count: 52 → 56`.
+- `wiki/hot.md` — refreshed.
+
+**Suggested next action:** `lint the wiki` — four new pages with many wikilinks; orphans / dead links / frontmatter gaps should be checked. Also worth verifying that the `Drizzle ORM` and `Prisma` and `TypeORM` entity pages exist (the comparisons link to them as `[[Drizzle ORM]]` / `[[Prisma]]` / `[[TypeORM]]`); if any are missing, those wikilinks will surface in the lint report and the entity pages should be filed.
+
+---
+
 ## 2026-04-29 — convention | Add `.inbox/` for cross-context idea capture
 
 **Filed:** new `.inbox/` folder + `.inbox/.processed/` archive + `.inbox/README.md`. Documented in `CLAUDE.md` under Conventions and Operations.
