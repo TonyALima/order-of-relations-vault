@@ -2,12 +2,12 @@
 type: overview
 title: "Wiki Index"
 created: 2026-04-29
-updated: 2026-04-29
+updated: 2026-04-30
 tags:
   - meta
   - index
 status: developing
-page_count: 57
+page_count: 58
 related: []
 sources: []
 ---
@@ -159,6 +159,7 @@ Side-by-side analyses defending OOR's design decisions against the prevailing al
 Filed answers to queries, plus **open questions** kept visible until resolved. Open questions carry `impact` + `effort` frontmatter and surface in the [[issues|Issue tracker]] Base.
 
 - 🔓 [[support-one-to-many]] — *open · high / L* — implement `@OneToMany` / `@ManyToOne` (the `TO_MANY` enum member is currently dead).
+- 🔓 [[support-and-or-conditions]] — *open · high / L* — extend `where` from a flat AND list to a real boolean tree (AND / OR / NOT).
 - 🔓 [[support-many-to-many]] — *open · medium / L* — implement `@ManyToMany` with a synthesized join table.
 - 🔓 [[decorator-order-independence]] — *open · medium / S* — could `@Column` / `@Nullable` work regardless of decoration order?
 - 🔓 [[support-user-indexes]] — *open · medium / M* — add `@Index` / `@Unique` so users can declare indexes?

@@ -2,9 +2,9 @@
 type: domain
 title: "Questions"
 subdomain_of: ""
-page_count: 6
+page_count: 7
 created: 2026-04-29
-updated: 2026-04-29
+updated: 2026-04-30
 tags:
   - meta
   - questions
@@ -38,6 +38,7 @@ The live, sortable view is at [[issues|Issue tracker]] (`wiki/meta/issues.base`)
 | Question | Impact | Effort |
 |---|---|---|
 | [[support-one-to-many]] — implement `@OneToMany` / `@ManyToOne` (the `TO_MANY` enum member is currently dead) | high | L |
+| [[support-and-or-conditions]] — extend `where` from a flat AND list to a real boolean tree (AND / OR / NOT, nested groups) | high | L |
 | [[support-many-to-many]] — implement `@ManyToMany` with synthesized join table | medium | L |
 | [[decorator-order-independence]] — `@Column` / `@Nullable` order independence | medium | S |
 | [[support-user-indexes]] — add `@Index` / `@Unique`; emit `CREATE INDEX` from schema-create | medium | M |

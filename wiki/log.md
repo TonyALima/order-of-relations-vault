@@ -2,7 +2,7 @@
 type: meta
 title: "Operation Log"
 created: 2026-04-29
-updated: 2026-04-29
+updated: 2026-04-30
 tags:
   - meta
   - log
@@ -14,6 +14,52 @@ sources: []
 # Operation Log
 
 Append-only record of every wiki operation. Newest entries on top. Never edit past entries — file new corrections instead.
+
+---
+
+## 2026-04-30 — correction | Remove `support-date-operators` open question
+
+**Reverts part of the previous entry.** [[support-date-operators]] (filed earlier today as *medium / M*) is removed. Owner's call: the existing nine-method `FieldConditionBuilder` surface — `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `isNull`, `isNotNull`, `in` — already supports date columns since `T[K] = Date` flows through the value parameter. Date queries like `u.createdAt!.gt(new Date(...))` work today. Anything that *doesn't* work is a bug, not an open question, and will be tracked through code tests rather than a wiki issue.
+
+**Convention reinforced:** open questions are for genuine design decisions, not for missing-but-trivially-derivable functionality. The "future API could narrow further" hint in [[Conditions Proxy]] remains a hint, not a tracked issue, until a concrete design proposal makes it one.
+
+**Files touched:**
+
+- `wiki/questions/support-date-operators.md` — deleted.
+- `wiki/questions/_index.md` — `page_count: 8 → 7`, removed from open-questions table.
+- `wiki/index.md` — `page_count: 59 → 58`, removed from Questions list.
+- `wiki/components/QueryBuilder.md` § Open Questions — entry removed; [[support-and-or-conditions]] remains.
+- `wiki/concepts/Conditions Proxy.md` § Open Questions — entry removed; [[support-and-or-conditions]] remains.
+- `wiki/hot.md` — refreshed.
+
+The previous log entry's wikilink to [[support-date-operators]] is now dead but preserved as audit trail (per `log.md` convention: "Dead wikilinks inside past log entries are preserved as audit trail and are not lint issues").
+
+---
+
+## 2026-04-30 — questions | Add two open questions on the query builder
+
+**Filed:**
+
+- [[support-and-or-conditions]] — *high / L* — extend the `where` callback from a flat AND list to a real boolean tree (AND / OR / NOT, nested groups). Anchored in [[QueryBuilder]] § Scope's explicit deferral. Three design options sketched (`Or`/`And` combinators à la TypeORM/Sequelize; recursive object tree à la Prisma; method-chaining `.orWhere()` à la TypeORM legacy); change-surface for the combinator option spelled out, including the [[Single-Table Inheritance|STI]] discriminator wrapping rule that breaks once the array becomes a tree. Effort is L because `Condition` becomes a discriminated union and SQL emission becomes recursive with parenthesisation.
+
+- [[support-date-operators]] — *medium / M* — narrow `FieldConditionBuilder<V>` for `V extends Date` with `between` / `before` / `after` / `eqDay` / `inMonth` / `inYear`. Anchored in [[Conditions Proxy]]'s "future API could narrow further" hint — date is the highest-value candidate to test the per-column-type narrowing pattern. Three options: type-conditional method surface (with sub-variants A1 = attach all methods at runtime, A2 = attach by PG type from `MetadataStorage`), standalone `DateOps` namespace, or `op` enum extension only (`between` for everyone). Effort is M because the typing infrastructure (conditional types over `V`) is novel for this codebase but localised to one module.
+
+**Why both at once:** they sit on different layers but both touch the `Condition` shape — AND/OR refactors it into a discriminated union (`leaf` / `and` / `or` / `not`); date operators add tuple-valued leaves (`between`'s value is `[V, V]`). Co-design or co-implementation is the natural path.
+
+**Cross-references added:**
+
+- [[QueryBuilder]] § Open Questions — both new questions added alongside [[get-one-limit-1]] and [[apply-options-accumulation]].
+- [[Conditions Proxy]] — new § Open Questions section, since the page's "uniform across V" framing is exactly what date narrowing would change, and the `(Condition | undefined)[]` callback shape is what AND/OR would extend.
+
+**Files touched:**
+
+- `wiki/questions/support-and-or-conditions.md` — new.
+- `wiki/questions/support-date-operators.md` — new.
+- `wiki/questions/_index.md` — `page_count: 6 → 8`, both questions inserted in the open-questions table at their priority slots (high/L next to one-to-many; medium/M next to user-indexes).
+- `wiki/index.md` — `page_count: 57 → 59`, both questions added to the Questions list.
+- `wiki/components/QueryBuilder.md` — Open Questions section now lists four entries.
+- `wiki/concepts/Conditions Proxy.md` — added Open Questions section.
+- `wiki/hot.md` — refreshed.
 
 ---
 

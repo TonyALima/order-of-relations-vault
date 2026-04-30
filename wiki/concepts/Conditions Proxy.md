@@ -115,6 +115,10 @@ userRepo.findMany({
 - [[Parameterized SQL]] — the safety property the proxy preserves.
 - [[0005-no-any-type-driven-api]] — the strictness ADR this construction depends on.
 
+## Open Questions
+
+- [[support-and-or-conditions]] — the array-as-AND structure forecloses OR; design space for AND / OR / NOT combinators.
+
 ## Sources
 
 - `.raw/architecture-overview.md` §§ "Lifecycle of a Query" (steps 3–4)

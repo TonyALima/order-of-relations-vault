@@ -175,6 +175,7 @@ The `?` is load-bearing — see [[Conditions Proxy]] for the rationale.
 
 ## Open Questions
 
+- [[support-and-or-conditions]] — extend `where` from a flat AND list to a real boolean tree (AND / OR / NOT, nested groups).
 - [[get-one-limit-1]] — `getOne()` slicing vs. `LIMIT 1`.
 - [[apply-options-accumulation]] — `applyOptions()` replace vs. accumulate.
 
